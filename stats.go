@@ -21,11 +21,13 @@ func main() {
 	}
 
 	db = &database.DB{Name: "videogames", Tables: []string{"steam", "mygames", "giantbomb"}, Session: session}
-	var fetcher *fetcher.Fetcher = &fetcher.Fetcher{Storage: db, SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID, GiantBombAPIKey: config.GiantBombAPIKey}
+	var steamFetcher = &fetcher.SteamFetcher{Storage: db, SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID, GiantBombAPIKey: config.GiantBombAPIKey}
 	if err := db.EnsureExists(); err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	fetcher.FetchAll()
+	ownedGames, _ := steamFetcher.GetOwnedGames(fetcher.JSONFetcher{})
+
+	log.Println(ownedGames.Response)
 
 }
