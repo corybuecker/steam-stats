@@ -1,19 +1,38 @@
-package database
+package storage
 
-import "github.com/dancannon/gorethink"
+import (
+	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/dancannon/gorethink"
+)
 
-type DB struct {
+type RethinkDB struct {
 	Name    string
 	Tables  []string
 	Session *gorethink.Session
 }
 
-func (db *DB) EnsureExists() error {
-	if err := ensureDBExists(db.Name, db.Session); err != nil {
+func (rethinkdb *RethinkDB) EnsureExists() error {
+	if err := ensureDBExists(rethinkdb.Name, rethinkdb.Session); err != nil {
 		return err
 	}
-	if err := ensureTablesExist(db.Name, db.Tables, db.Session); err != nil {
+	if err := ensureTablesExist(rethinkdb.Name, rethinkdb.Tables, rethinkdb.Session); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (rethinkdb *RethinkDB) UpdateOwnedGames(ownedgames *fetcher.OwnedGames) error {
+	for _, ownedgame := range ownedgames.Response.Games {
+		ownedGameMap := map[string]interface{}{
+			"id":              ownedgame.ID,
+			"name":            ownedgame.Name,
+			"playtimeForever": ownedgame.PlaytimeForever,
+			"playtimeRecent":  ownedgame.PlaytimeRecent,
+		}
+
+		if _, err := gorethink.DB(rethinkdb.Name).Table("ownedgames").Insert(ownedGameMap, gorethink.InsertOpts{Conflict: "update"}).RunWrite(rethinkdb.Session); err != nil {
+			return err
+		}
 	}
 	return nil
 }
