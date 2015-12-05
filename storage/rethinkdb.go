@@ -1,7 +1,8 @@
 package storage
 
 import (
-	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats/giantbomb"
+	"github.com/corybuecker/steam-stats/steam"
 	"github.com/dancannon/gorethink"
 )
 
@@ -11,17 +12,7 @@ type RethinkDB struct {
 	Session *gorethink.Session
 }
 
-func (rethinkdb *RethinkDB) EnsureExists() error {
-	if err := ensureDBExists(rethinkdb.Name, rethinkdb.Session); err != nil {
-		return err
-	}
-	if err := ensureTablesExist(rethinkdb.Name, rethinkdb.Tables, rethinkdb.Session); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (rethinkdb *RethinkDB) UpdateOwnedGames(ownedgames *fetcher.OwnedGames) error {
+func (rethinkdb *RethinkDB) UpdateOwnedGames(ownedgames *steam.OwnedGames) error {
 	for _, ownedgame := range ownedgames.Response.Games {
 		ownedGameMap := map[string]interface{}{
 			"id":              ownedgame.ID,
@@ -33,6 +24,30 @@ func (rethinkdb *RethinkDB) UpdateOwnedGames(ownedgames *fetcher.OwnedGames) err
 		if _, err := gorethink.DB(rethinkdb.Name).Table("ownedgames").Insert(ownedGameMap, gorethink.InsertOpts{Conflict: "update"}).RunWrite(rethinkdb.Session); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (rethinkdb *RethinkDB) UpdateGiantBomb(searchResults []giantbomb.SearchResult) error {
+	for _, result := range searchResults {
+		resultMap := map[string]interface{}{
+			"id":   result.ID,
+			"name": result.Name,
+		}
+
+		if _, err := gorethink.DB(rethinkdb.Name).Table("giantbomb").Insert(resultMap, gorethink.InsertOpts{Conflict: "update"}).RunWrite(rethinkdb.Session); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (rethinkdb *RethinkDB) EnsureExists() error {
+	if err := ensureDBExists(rethinkdb.Name, rethinkdb.Session); err != nil {
+		return err
+	}
+	if err := ensureTablesExist(rethinkdb.Name, rethinkdb.Tables, rethinkdb.Session); err != nil {
+		return err
 	}
 	return nil
 }
