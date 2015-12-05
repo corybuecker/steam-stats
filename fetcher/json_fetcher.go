@@ -11,7 +11,7 @@ type JSONFetcherInterface interface {
 
 type JSONFetcher struct{}
 
-func (fetcher *JSONFetcher) fetch(url string) ([]byte, error) {
+func (fetcher *JSONFetcher) Fetch(url string) ([]byte, error) {
 	response, err := http.Get(url)
 
 	if err != nil {

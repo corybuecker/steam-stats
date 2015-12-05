@@ -4,7 +4,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats/giantbomb"
+	"github.com/corybuecker/steam-stats/steam"
 	r "github.com/dancannon/gorethink"
 )
 
@@ -20,14 +21,13 @@ func init() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	r.DBDrop("test_create").Run(session)
-	rethinkdb = &RethinkDB{Name: "test_create", Tables: []string{"ownedgames"}, Session: session}
 }
 
 func TestUpdateOwnedGames(t *testing.T) {
-	ownedGames := &fetcher.OwnedGames{
-		Response: fetcher.Response{
-			Games: []fetcher.OwnedGame{
+	beforeEach()
+	ownedGames := &steam.OwnedGames{
+		Response: steam.Response{
+			Games: []steam.OwnedGame{
 				{
 					ID:              1,
 					PlaytimeForever: 1,
@@ -50,7 +50,34 @@ func TestUpdateOwnedGames(t *testing.T) {
 	}
 }
 
+func TestUpdateGiantBomb(t *testing.T) {
+	beforeEach()
+	results := &giantbomb.Search{
+		Results: []giantbomb.SearchResult{
+			{ID: 1, Name: "test"},
+		},
+	}
+	rethinkdb.EnsureExists()
+	err := rethinkdb.UpdateGiantBomb(results.Results)
+
+	if err != nil {
+		t.Error(err)
+	}
+	var row interface{}
+	res, err := r.DB("test_create").Table("giantbomb").Filter(map[string]interface{}{"id": 1}).Run(session)
+	err = res.One(&row)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func beforeEach() {
+	r.DBDrop("test_create").Run(session)
+	rethinkdb = &RethinkDB{Name: "test_create", Tables: []string{"ownedgames", "giantbomb"}, Session: session}
+}
+
 func TestDatabaseCreation(t *testing.T) {
+	beforeEach()
 	if err := rethinkdb.EnsureExists(); err != nil {
 		t.Error(err.Error())
 	}
@@ -61,6 +88,7 @@ func TestDatabaseCreation(t *testing.T) {
 }
 
 func TestTableCreation(t *testing.T) {
+	beforeEach()
 	var cursor *r.Cursor
 	var err error
 	var knownTables []string

@@ -24,8 +24,8 @@ func init() {
 }
 
 func TestSuccessfulCall(t *testing.T) {
-	var fetcher *JSONFetcher = new(JSONFetcher)
-	response, _ := fetcher.fetch(server.URL)
+	var fetcher JSONFetcher = JSONFetcher{}
+	response, _ := fetcher.Fetch(server.URL)
 	if bytes.Compare(response, []byte(sampleResponse)) != 0 {
 		t.Error("expected to return sample response")
 	}
