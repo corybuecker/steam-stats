@@ -42,8 +42,10 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		if err := rethinkdb.UpdateGiantBomb(search.Results); err != nil {
-			log.Println(err.Error())
+		if len(search.Results) > 0 {
+			if err := rethinkdb.UpdateGiantBomb(search.Results); err != nil {
+				log.Println(err.Error())
+			}
 		}
 	}
 
