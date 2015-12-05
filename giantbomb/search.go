@@ -3,6 +3,7 @@ package giantbomb
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/corybuecker/steam-stats/fetcher"
@@ -22,7 +23,7 @@ type Fetcher struct {
 }
 
 func (fetcher *Fetcher) generateSearchURL(name string) string {
-	return fmt.Sprintf("http://www.giantbomb.com/api/games/?api_key=%s&format=json&filter=name:%s&field_list=id,name", fetcher.GiantBombAPIKey, name)
+	return fmt.Sprintf("http://www.giantbomb.com/api/games/?api_key=%s&format=json&filter=name:%s&field_list=id,name", fetcher.GiantBombAPIKey, url.QueryEscape(name))
 }
 
 func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.JSONFetcher, ownedGame *steam.OwnedGame) (*Search, error) {
