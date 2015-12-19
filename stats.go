@@ -29,7 +29,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	ownedGames, _ := steamFetcher.GetOwnedGames(fetcher.JSONFetcher{})
+	ownedGames, _ := steamFetcher.GetOwnedGames(&fetcher.JSONFetcher{})
 
 	if err := rethinkdb.UpdateOwnedGames(ownedGames); err != nil {
 		log.Fatalln(err.Error())
@@ -38,7 +38,7 @@ func main() {
 	for _, ownedGame := range ownedGames.Response.Games {
 		log.Printf("searching Giantbomb for --- %s", ownedGame.Name)
 		var search *giantbomb.Search
-		search, err = giantBombFetcher.FindOwnedGame(fetcher.JSONFetcher{}, &ownedGame)
+		search, err = giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, &ownedGame)
 		if err != nil {
 			log.Println(err.Error())
 		}

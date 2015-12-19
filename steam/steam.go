@@ -1,7 +1,6 @@
 package steam
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/corybuecker/steam-stats/fetcher"
@@ -30,19 +29,14 @@ func (fetcher *Fetcher) generateURL() string {
 	return fmt.Sprintf("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json&include_appinfo=1&include_played_free_games=1", fetcher.SteamAPIKey, fetcher.SteamID)
 }
 
-func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcher) (*OwnedGames, error) {
-	response, err := jsonfetcher.Fetch(fetcher.generateURL())
-	if err != nil {
-		return nil, err
-	}
+func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcherInterface) (*OwnedGames, error) {
+	var data OwnedGames = OwnedGames{}
 
-	var ownedGames = new(OwnedGames)
-
-	err = json.Unmarshal(response, ownedGames)
+	err := jsonfetcher.Fetch(fetcher.generateURL(), &data)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return ownedGames, nil
+	return &data, nil
 }

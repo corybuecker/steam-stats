@@ -1,7 +1,6 @@
 package fetcher
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +9,22 @@ import (
 
 var server *httptest.Server
 var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+
+type MarshalStruct struct {
+	Response struct {
+		Games []struct {
+			ID              int    `json:"appid"`
+			Name            string `json:"name"`
+			PlaytimeForever int    `json:"playtime_forever"`
+			PlaytimeRecent  int    `json:"playtime_2weeks"`
+		} `json:"games"`
+	} `json:"response"`
+}
+
+type BadMarshalStruct struct {
+	Response struct {
+	} `json:"bad"`
+}
 
 func buildServer() {
 	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,10 +38,21 @@ func init() {
 	buildServer()
 }
 
-func TestSuccessfulCall(t *testing.T) {
+func TestSuccessfulMarshal(t *testing.T) {
 	var fetcher JSONFetcher = JSONFetcher{}
-	response, _ := fetcher.Fetch(server.URL)
-	if bytes.Compare(response, []byte(sampleResponse)) != 0 {
+	data := MarshalStruct{}
+	fetcher.Fetch(server.URL, &data)
+	if data.Response.Games[0].ID != 10 {
 		t.Error("expected to return sample response")
+	}
+}
+
+func TestUnsuccessfulMarshal(t *testing.T) {
+	var fetcher JSONFetcher = JSONFetcher{}
+	data := BadMarshalStruct{}
+	emptyStruct := BadMarshalStruct{}
+	fetcher.Fetch(server.URL, &data)
+	if data != emptyStruct {
+		t.Error("expected an empty struct")
 	}
 }
