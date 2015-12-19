@@ -1,21 +1,23 @@
 package fetcher
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 )
 
 type JSONFetcherInterface interface {
-	fetch(url string) ([]byte, error)
+	Fetch(string, interface{}) error
 }
 
 type JSONFetcher struct{}
 
-func (fetcher *JSONFetcher) Fetch(url string) ([]byte, error) {
+func (fetcher *JSONFetcher) Fetch(url string, structToLoad interface{}) error {
+	var err error
 	response, err := http.Get(url)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer response.Body.Close()
@@ -23,8 +25,14 @@ func (fetcher *JSONFetcher) Fetch(url string) ([]byte, error) {
 	contents, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return contents, nil
+	err = json.Unmarshal(contents, structToLoad)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

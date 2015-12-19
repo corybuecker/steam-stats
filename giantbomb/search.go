@@ -1,7 +1,6 @@
 package giantbomb
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"time"
@@ -26,21 +25,16 @@ func (fetcher *Fetcher) generateSearchURL(name string) string {
 	return fmt.Sprintf("http://www.giantbomb.com/api/games/?api_key=%s&format=json&filter=name:%s&field_list=id,name", fetcher.GiantBombAPIKey, url.QueryEscape(name))
 }
 
-func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.JSONFetcher, ownedGame *steam.OwnedGame) (*Search, error) {
-	response, err := jsonfetcher.Fetch(fetcher.generateSearchURL(ownedGame.Name))
+func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.JSONFetcherInterface, ownedGame *steam.OwnedGame) (*Search, error) {
+	var data Search = Search{}
+
+	err := jsonfetcher.Fetch(fetcher.generateSearchURL(ownedGame.Name), &data)
+
 	time.Sleep(time.Second)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var searchResults = new(Search)
-
-	err = json.Unmarshal(response, searchResults)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return searchResults, nil
+	return &data, nil
 }
