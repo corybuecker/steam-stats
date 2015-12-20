@@ -26,7 +26,7 @@ func (fetcher *Fetcher) generateSearchURL(name string) string {
 }
 
 func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.JSONFetcherInterface, ownedGame *steam.OwnedGame) (*Search, error) {
-	var data Search = Search{}
+	var data = Search{}
 
 	err := jsonfetcher.Fetch(fetcher.generateSearchURL(ownedGame.Name), &data)
 

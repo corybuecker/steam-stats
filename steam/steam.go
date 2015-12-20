@@ -30,7 +30,7 @@ func (fetcher *Fetcher) generateURL() string {
 }
 
 func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcherInterface) (*OwnedGames, error) {
-	var data OwnedGames = OwnedGames{}
+	var data = OwnedGames{}
 
 	err := jsonfetcher.Fetch(fetcher.generateURL(), &data)
 
