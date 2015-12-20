@@ -2,7 +2,9 @@ package steam
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/corybuecker/steam-stats/database"
 	"github.com/corybuecker/steam-stats/fetcher"
 )
 
@@ -23,20 +25,34 @@ type OwnedGames struct {
 type Fetcher struct {
 	SteamAPIKey string
 	SteamID     string
+	OwnedGames  OwnedGames
 }
 
 func (fetcher *Fetcher) generateURL() string {
 	return fmt.Sprintf("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json&include_appinfo=1&include_played_free_games=1", fetcher.SteamAPIKey, fetcher.SteamID)
 }
 
-func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcherInterface) (*OwnedGames, error) {
-	var data = OwnedGames{}
-
-	err := jsonfetcher.Fetch(fetcher.generateURL(), &data)
-
-	if err != nil {
-		return nil, err
+func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcherInterface) error {
+	if err := jsonfetcher.Fetch(fetcher.generateURL(), &fetcher.OwnedGames); err != nil {
+		return err
 	}
 
-	return &data, nil
+	log.Printf("found %d games in the user's library", len(fetcher.OwnedGames.Response.Games))
+
+	return nil
+}
+func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
+	for _, ownedGame := range fetcher.OwnedGames.Response.Games {
+		ownedGameMap := map[string]interface{}{
+			"id":              ownedGame.ID,
+			"name":            ownedGame.Name,
+			"playtimeForever": ownedGame.PlaytimeForever,
+			"playtimeRecent":  ownedGame.PlaytimeRecent,
+		}
+
+		if err := database.UpdateEntry("videogames", "ownedgames", ownedGameMap); err != nil {
+			return err
+		}
+	}
+	return nil
 }

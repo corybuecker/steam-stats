@@ -4,6 +4,9 @@ import (
 	"log"
 
 	"github.com/corybuecker/steam-stats/configuration"
+	"github.com/corybuecker/steam-stats/database"
+	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats/steam"
 	"github.com/corybuecker/steam-stats/storage"
 	"github.com/dancannon/gorethink"
 )
@@ -16,15 +19,26 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
+	// var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
+
 	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
 
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	rethinkDB := storage.RethinkDB{Session: session}
+	rethinkDB := database.RethinkDB{Session: session}
 
-	storage.Setup(&rethinkDB, "cory", make([]string, 0))
+	storage.Setup(&rethinkDB, "videogames", []string{"ownedgames", "giantbomb"})
+
+	if err := steamFetcher.GetOwnedGames(&fetcher.JSONFetcher{}); err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	if err := steamFetcher.UpdateOwnedGames(&rethinkDB); err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	//
 	// rethinkdb = &storage.RethinkDB{Name: "videogames", Tables: []string{"ownedgames", "giantbomb", "steam_giantbomb"}, Session: session}
