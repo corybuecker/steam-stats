@@ -1,15 +1,31 @@
 package main
 
+import (
+	"log"
+
+	"github.com/corybuecker/steam-stats/configuration"
+	"github.com/corybuecker/steam-stats/storage"
+	"github.com/dancannon/gorethink"
+)
+
 func main() {
-	// var rethinkdb *storage.RethinkDB
-	// var config = new(configuration.Configuration)
-	// if err := config.Load("./config.json"); err != nil {
-	// 	log.Fatal(err)
-	// }
-	// session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
-	// if err != nil {
-	// 	log.Fatalln(err.Error())
-	// }
+
+	var config = new(configuration.Configuration)
+
+	if err := config.Load("./config.json"); err != nil {
+		log.Fatal(err)
+	}
+
+	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	rethinkDB := storage.RethinkDB{Session: session}
+
+	storage.Setup(&rethinkDB, "cory", make([]string, 0))
+
 	//
 	// rethinkdb = &storage.RethinkDB{Name: "videogames", Tables: []string{"ownedgames", "giantbomb", "steam_giantbomb"}, Session: session}
 	// var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
