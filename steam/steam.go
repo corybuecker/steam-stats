@@ -32,7 +32,7 @@ func (fetcher *Fetcher) generateURL() string {
 	return fmt.Sprintf("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json&include_appinfo=1&include_played_free_games=1", fetcher.SteamAPIKey, fetcher.SteamID)
 }
 
-func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.JSONFetcherInterface) error {
+func (fetcher *Fetcher) GetOwnedGames(jsonfetcher fetcher.Interface) error {
 	if err := jsonfetcher.Fetch(fetcher.generateURL(), &fetcher.OwnedGames); err != nil {
 		return err
 	}
@@ -50,9 +50,25 @@ func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 			"playtimeRecent":  ownedGame.PlaytimeRecent,
 		}
 
-		if err := database.UpdateEntry("videogames", "ownedgames", ownedGameMap); err != nil {
+		if err := database.Upsert("videogames", "ownedgames", ownedGameMap); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+func (fetcher *Fetcher) FetchOwnedGames(database database.Interface) ([]string, error) {
+	var gamesList []map[string]interface{}
+	var err error
+
+	var games = make([]string, 0)
+
+	if gamesList, err = database.RowsWithoutField("videogames", "ownedgames", "giantbomb_id"); err != nil {
+		return nil, err
+	}
+
+	for _, game := range gamesList {
+		games = append(games, game["name"].(string))
+	}
+
+	return games, nil
 }

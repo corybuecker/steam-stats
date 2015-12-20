@@ -3,18 +3,19 @@ package database
 import "github.com/dancannon/gorethink"
 
 type Interface interface {
-	UpdateEntry(string, string, map[string]interface{}) error
+	Upsert(string, string, map[string]interface{}) error
 	CreateTable(string, string) error
 	CreateDatabase(string) error
 	ListDatabases() ([]string, error)
 	ListTables(string) ([]string, error)
+	RowsWithoutField(string, string, string) ([]map[string]interface{}, error)
 }
 
 type RethinkDB struct {
 	Session *gorethink.Session
 }
 
-func (rethinkDB *RethinkDB) UpdateEntry(databaseName string, tableName string, record map[string]interface{}) error {
+func (rethinkDB *RethinkDB) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
 	if _, err := gorethink.DB(databaseName).Table(tableName).Insert(record, gorethink.InsertOpts{Conflict: "update"}).RunWrite(rethinkDB.Session); err != nil {
 		return err
 	}
@@ -59,4 +60,22 @@ func (rethinkDB *RethinkDB) ListTables(databaseName string) ([]string, error) {
 		return nil, err
 	}
 	return tables, nil
+}
+func (rethinkDB *RethinkDB) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
+	var rows []map[string]interface{}
+	var err error
+	var cursor *gorethink.Cursor
+
+	filterFunction := func(game gorethink.Term) gorethink.Term {
+		return game.HasFields(fieldToExclude).Eq(false)
+	}
+
+	if cursor, err = gorethink.DB(databaseName).Table(tableName).Filter(filterFunction).Run(rethinkDB.Session); err != nil {
+		return nil, err
+	}
+
+	if err = cursor.All(&rows); err != nil {
+		return nil, err
+	}
+	return rows, nil
 }

@@ -4,9 +4,38 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
-
-	"github.com/corybuecker/steam-stats/steam"
 )
+
+var fakeDatabase fakeRethinkDB
+
+type fakeRethinkDB struct {
+	Entry map[string]interface{}
+}
+
+func (rethinkDB *fakeRethinkDB) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
+	rethinkDB.Entry = record
+	return nil
+}
+func (rethinkDB *fakeRethinkDB) CreateTable(databaseName string, tableName string) error {
+	return nil
+}
+func (rethinkDB *fakeRethinkDB) CreateDatabase(databaseName string) error {
+	return nil
+}
+func (rethinkDB *fakeRethinkDB) ListDatabases() ([]string, error) {
+	return nil, nil
+}
+func (rethinkDB *fakeRethinkDB) ListTables(databaseName string) ([]string, error) {
+	return nil, nil
+}
+
+func (rethinkDB *fakeRethinkDB) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
+	return []map[string]interface{}{
+		{
+			"name": "mario",
+		},
+	}, nil
+}
 
 type FakeFetcher struct{}
 
@@ -37,8 +66,22 @@ func TestURLIncludesSearchName(t *testing.T) {
 }
 
 func TestDataMarshalling(t *testing.T) {
-	foundGames, _ := gbFetcher.FindOwnedGame(&FakeFetcher{}, &steam.OwnedGame{Name: "gamename"})
-	if foundGames.Results[0].ID != 1 {
+	if err := gbFetcher.FindOwnedGame(&FakeFetcher{}, "gamename"); err != nil {
+		t.Error(err)
+	}
+	if gbFetcher.SearchResults.Results[0].ID != 1 {
 		t.Error("expected ID of 1")
+	}
+}
+
+func TestDataUpdating(t *testing.T) {
+	if err := gbFetcher.FindOwnedGame(&FakeFetcher{}, "gamename"); err != nil {
+		t.Error(err)
+	}
+	if err := gbFetcher.UpdateFoundGames(&fakeDatabase); err != nil {
+		t.Error(err)
+	}
+	if fakeDatabase.Entry["name"] != "foundgame" {
+		t.Error("expected the entry to have an ID of 10")
 	}
 }

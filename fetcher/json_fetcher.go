@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type JSONFetcherInterface interface {
+type Interface interface {
 	Fetch(string, interface{}) error
 }
 

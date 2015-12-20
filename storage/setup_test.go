@@ -11,7 +11,7 @@ type fakeRethinkDB struct {
 	existingTables    []string
 }
 
-func (rethinkDB *fakeRethinkDB) UpdateEntry(databaseName string, tableName string, record map[string]interface{}) error {
+func (rethinkDB *fakeRethinkDB) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
 	return nil
 }
 func (rethinkDB *fakeRethinkDB) CreateTable(databaseName string, tableName string) error {
@@ -27,6 +27,14 @@ func (rethinkDB *fakeRethinkDB) ListDatabases() ([]string, error) {
 }
 func (rethinkDB *fakeRethinkDB) ListTables(databaseName string) ([]string, error) {
 	return rethinkDB.existingTables, nil
+}
+
+func (rethinkDB *fakeRethinkDB) Filter(function func()) (map[string]interface{}, error) {
+	return map[string]interface{}{}, nil
+}
+
+func (rethinkDB *fakeRethinkDB) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
+	return []map[string]interface{}{}, nil
 }
 
 func init() {

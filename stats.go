@@ -6,6 +6,7 @@ import (
 	"github.com/corybuecker/steam-stats/configuration"
 	"github.com/corybuecker/steam-stats/database"
 	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats/giantbomb"
 	"github.com/corybuecker/steam-stats/steam"
 	"github.com/corybuecker/steam-stats/storage"
 	"github.com/dancannon/gorethink"
@@ -20,7 +21,7 @@ func main() {
 	}
 
 	var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
-	// var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
+	var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
 
 	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
 
@@ -40,32 +41,18 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	//
-	// rethinkdb = &storage.RethinkDB{Name: "videogames", Tables: []string{"ownedgames", "giantbomb", "steam_giantbomb"}, Session: session}
-	// var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
-	// var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
-	// if err := rethinkdb.EnsureExists(); err != nil {
-	// 	log.Fatalln(err)
-	// }
-	//
-	// ownedGames, _ := steamFetcher.GetOwnedGames(&fetcher.JSONFetcher{})
-	//
-	// if err := rethinkdb.UpdateOwnedGames(ownedGames); err != nil {
-	// 	log.Fatalln(err.Error())
-	// }
-	//
-	// for _, ownedGame := range ownedGames.Response.Games {
-	// 	log.Printf("searching Giantbomb for --- %s", ownedGame.Name)
-	// 	var search *giantbomb.Search
-	// 	search, err = giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, &ownedGame)
-	// 	if err != nil {
-	// 		log.Println(err.Error())
-	// 	}
-	// 	if len(search.Results) > 0 {
-	// 		if err := rethinkdb.UpdateGiantBomb(search.Results); err != nil {
-	// 			log.Println(err.Error())
-	// 		}
-	// 	}
-	// }
-	//
+	var ownedGamesWithoutGiantBombID []string
+
+	if ownedGamesWithoutGiantBombID, err = steamFetcher.FetchOwnedGames(&rethinkDB); err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	for _, ownedGame := range ownedGamesWithoutGiantBombID {
+		if err := giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, ownedGame); err != nil {
+			log.Println("errr")
+		}
+		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {
+			log.Println("errr")
+		}
+	}
 }
