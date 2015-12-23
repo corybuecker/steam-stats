@@ -2,6 +2,7 @@ package fetcher
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -18,6 +19,10 @@ func (fetcher *JSONFetcher) Fetch(url string, structToLoad interface{}) error {
 
 	if err != nil {
 		return err
+	}
+
+	if response.StatusCode != 200 {
+		return errors.New("the HTTP call returned a non-200 response")
 	}
 
 	defer response.Body.Close()

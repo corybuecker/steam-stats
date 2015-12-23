@@ -49,10 +49,10 @@ func main() {
 
 	for _, ownedGame := range ownedGamesWithoutGiantBombID {
 		if err := giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, ownedGame); err != nil {
-			log.Println("errr")
+			log.Println(err.Error())
 		}
 		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {
-			log.Println("errr")
+			log.Println(err.Error())
 		}
 	}
 }

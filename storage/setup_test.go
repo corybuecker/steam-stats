@@ -49,7 +49,7 @@ func TestCreatesDatabase(t *testing.T) {
 		t.Error(err)
 	}
 	if fakeDatabase.databaseCreated != "videogames" {
-		t.Error("expected that it created the database")
+		t.Errorf("expected %s, got %s", "videogames", fakeDatabase.databaseCreated)
 	}
 }
 
@@ -61,7 +61,7 @@ func TestDoesNotCreateExistingDatabase(t *testing.T) {
 		t.Error(err)
 	}
 	if fakeDatabase.databaseCreated != "" {
-		t.Error("expected that it did not create the database")
+		t.Errorf("expected \"\", got %s", fakeDatabase.databaseCreated)
 	}
 }
 

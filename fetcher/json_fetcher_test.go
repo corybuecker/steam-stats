@@ -26,16 +26,16 @@ type BadMarshalStruct struct {
 	} `json:"bad"`
 }
 
-func buildServer() {
+func buildServer(responseCode int) {
 	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(responseCode)
 		fmt.Fprint(w, sampleResponse)
 	}))
 }
 
 func init() {
-	buildServer()
+	buildServer(200)
 }
 
 func TestSuccessfulMarshal(t *testing.T) {
@@ -44,6 +44,16 @@ func TestSuccessfulMarshal(t *testing.T) {
 	fetcher.Fetch(server.URL, &data)
 	if data.Response.Games[0].ID != 10 {
 		t.Error("expected to return sample response")
+	}
+}
+
+func TestUnsuccessfulHTTPCode(t *testing.T) {
+	buildServer(500)
+	data := MarshalStruct{}
+	var fetcher JSONFetcher = JSONFetcher{}
+	err := fetcher.Fetch(server.URL, &data)
+	if err == nil {
+		t.Errorf("expected an error, but none was returned")
 	}
 }
 
