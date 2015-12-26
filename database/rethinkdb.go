@@ -9,6 +9,7 @@ type Interface interface {
 	ListDatabases() ([]string, error)
 	ListTables(string) ([]string, error)
 	RowsWithoutField(string, string, string) ([]map[string]interface{}, error)
+	GetRow(string, string, string) (map[string]interface{}, error)
 }
 
 type RethinkDB struct {
@@ -78,4 +79,18 @@ func (rethinkDB *RethinkDB) RowsWithoutField(databaseName string, tableName stri
 		return nil, err
 	}
 	return rows, nil
+}
+func (rethinkDB *RethinkDB) GetRow(databaseName string, tableName string, field string) (map[string]interface{}, error) {
+	var row map[string]interface{}
+	var err error
+	var cursor *gorethink.Cursor
+
+	if cursor, err = gorethink.DB(databaseName).Table(tableName).Get(field).Run(rethinkDB.Session); err != nil {
+		return nil, err
+	}
+
+	if err = cursor.One(&row); err != nil {
+		return nil, err
+	}
+	return row, nil
 }

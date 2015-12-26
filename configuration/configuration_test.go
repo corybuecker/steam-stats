@@ -1,33 +1,31 @@
 package configuration
 
-import "testing"
+import (
+	"testing"
 
-func TestMissingFile(t *testing.T) {
-	configuration := Configuration{}
-	err := configuration.Load("doesnotexist")
+	"github.com/corybuecker/steam-stats/test"
+)
 
-	if err == nil {
-		t.Fatalf("should have failed to open missing file")
-	}
-}
-func TestInvalidFile(t *testing.T) {
-	configuration := Configuration{}
-	err := configuration.Load("../__test/invalid_config.json")
+func TestConfiguration(t *testing.T) {
+	fakeDatabase := test.FakeDatabase{}
 
-	if err == nil {
-		t.Fatalf("should have failed to parse bad file")
-	}
-}
-
-func TestValidFile(t *testing.T) {
-	configuration := Configuration{}
-	err := configuration.Load("../__test/valid_config.json")
-
-	if err != nil {
-		t.Fatalf("should have parsed valid file")
+	fakeDatabase.Rows = map[string]interface{}{
+		"steamApiKey":     "1",
+		"steamId":         "1",
+		"giantBombApiKey": "1",
 	}
 
-	if configuration.GiantBombAPIKey != "12345" {
-		t.Fatalf("should have parsed valid file")
+	c := Configuration{}
+	if err := c.Load(&fakeDatabase); err != nil {
+		t.Error(err)
+	}
+	if c.SteamID != "1" {
+		t.Errorf("expected %s, got %s", "1", c.SteamID)
+	}
+	if c.GiantBombAPIKey != "1" {
+		t.Errorf("expected %s, got %s", "1", c.SteamID)
+	}
+	if c.SteamAPIKey != "1" {
+		t.Errorf("expected %s, got %s", "1", c.SteamID)
 	}
 }

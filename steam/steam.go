@@ -62,7 +62,7 @@ func (fetcher *Fetcher) FetchOwnedGames(database database.Interface) ([]string, 
 
 	var games = make([]string, 0)
 
-	if gamesList, err = database.RowsWithoutField("videogames", "ownedgames", "giantbomb_id"); err != nil {
+	if gamesList, err = database.RowsWithoutField("videogames", "ownedgames", "giantbomb"); err != nil {
 		return nil, err
 	}
 

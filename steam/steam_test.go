@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"github.com/corybuecker/steam-stats/test"
 )
 
 type FakeFetcher struct{}
@@ -17,40 +19,10 @@ func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
 }
 
 var steamFetcher Fetcher
-
-var fakeDatabase fakeRethinkDB
-
-type fakeRethinkDB struct {
-	Entry map[string]interface{}
-}
-
-func (rethinkDB *fakeRethinkDB) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
-	rethinkDB.Entry = record
-	return nil
-}
-func (rethinkDB *fakeRethinkDB) CreateTable(databaseName string, tableName string) error {
-	return nil
-}
-func (rethinkDB *fakeRethinkDB) CreateDatabase(databaseName string) error {
-	return nil
-}
-func (rethinkDB *fakeRethinkDB) ListDatabases() ([]string, error) {
-	return nil, nil
-}
-func (rethinkDB *fakeRethinkDB) ListTables(databaseName string) ([]string, error) {
-	return nil, nil
-}
-
-func (rethinkDB *fakeRethinkDB) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
-	return []map[string]interface{}{
-		{
-			"name": "mario",
-		},
-	}, nil
-}
+var fakeDatabase test.FakeDatabase
 
 func init() {
-	fakeDatabase = fakeRethinkDB{}
+	fakeDatabase = test.FakeDatabase{}
 	steamFetcher = Fetcher{SteamAPIKey: "API KEY", SteamID: "ID"}
 }
 
