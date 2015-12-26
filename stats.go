@@ -13,8 +13,15 @@ import (
 )
 
 func main() {
+	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	var rethinkDB database.RethinkDB
+	rethinkDB = database.RethinkDB{Session: session}
 
-	var config = new(configuration.Configuration)
+	var config configuration.Configuration
+	config = configuration.Configuration{}
 
 	if err := config.Load("./config.json"); err != nil {
 		log.Fatal(err)
@@ -23,13 +30,9 @@ func main() {
 	var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
 	var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
 
-	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
-
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-
-	rethinkDB := database.RethinkDB{Session: session}
 
 	storage.Setup(&rethinkDB, "videogames", []string{"ownedgames", "giantbomb"})
 
