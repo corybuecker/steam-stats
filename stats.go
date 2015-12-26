@@ -23,7 +23,7 @@ func main() {
 	var config configuration.Configuration
 	config = configuration.Configuration{}
 
-	if err := config.Load("./config.json"); err != nil {
+	if err := config.Load(&rethinkDB); err != nil {
 		log.Fatal(err)
 	}
 

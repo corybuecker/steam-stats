@@ -6,6 +6,7 @@ type FakeDatabase struct {
 	ExistingDatabases []string
 	TableCreated      string
 	ExistingTables    []string
+	Rows              map[string]interface{}
 }
 
 func (rethinkDB *FakeDatabase) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
@@ -37,5 +38,5 @@ func (rethinkDB *FakeDatabase) RowsWithoutField(databaseName string, tableName s
 }
 
 func (rethinkDB *FakeDatabase) GetRow(databaseName string, tableName string, field string) (map[string]interface{}, error) {
-	return nil, nil
+	return rethinkDB.Rows, nil
 }
