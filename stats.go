@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/corybuecker/steam-stats/configuration"
 	"github.com/corybuecker/steam-stats/database"
@@ -13,7 +14,9 @@ import (
 )
 
 func main() {
-	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: "localhost:28015"})
+	rethinkdbURL := os.Args[1:][0]
+
+	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: rethinkdbURL})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
