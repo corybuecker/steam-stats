@@ -14,9 +14,13 @@ import (
 )
 
 func main() {
-	rethinkdbURL := os.Args[1:][0]
+	commandLineArgs := os.Args[1:]
 
-	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: rethinkdbURL})
+	if len(commandLineArgs) != 1 {
+		log.Fatalf("you must provide one argument, the connection string for RethinkDB")
+	}
+
+	session, err := gorethink.Connect(gorethink.ConnectOpts{Address: commandLineArgs[0]})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
