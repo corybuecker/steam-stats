@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/url"
-	"time"
 
 	"github.com/corybuecker/steam-stats/database"
 	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats/ratelimiters"
 )
 
 type Search struct {
@@ -22,6 +22,7 @@ type SearchResult struct {
 type Fetcher struct {
 	GiantBombAPIKey string
 	SearchResults   Search
+	RateLimiter     *ratelimiters.GiantBombRateLimiter
 }
 
 func (fetcher *Fetcher) generateSearchURL(name string) string {
@@ -29,11 +30,17 @@ func (fetcher *Fetcher) generateSearchURL(name string) string {
 }
 
 func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.Interface, gameName string) error {
+	if fetcher.RateLimiter == nil {
+		fetcher.RateLimiter = &ratelimiters.GiantBombRateLimiter{}
+	}
+
 	log.Printf("searching for %s in the GiantBomb API", gameName)
 
 	err := jsonfetcher.Fetch(fetcher.generateSearchURL(gameName), &fetcher.SearchResults)
 
-	time.Sleep(time.Second)
+	if err := fetcher.RateLimiter.ObeyRateLimit(); err != nil {
+		return err
+	}
 
 	if err != nil {
 		return err
