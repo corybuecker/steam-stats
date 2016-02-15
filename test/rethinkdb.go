@@ -29,10 +29,19 @@ func (rethinkDB *FakeDatabase) ListTables(databaseName string) ([]string, error)
 	return rethinkDB.ExistingTables, nil
 }
 
-func (rethinkDB *FakeDatabase) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
+func (rethinkDB *FakeDatabase) RowsWithoutFields(databaseName string, tableName string, fieldsToExclude []string) ([]map[string]interface{}, error) {
 	return []map[string]interface{}{
 		{
 			"name": "mario",
+		},
+	}, nil
+}
+
+func (rethinkDB *FakeDatabase) RowsWithField(databaseName string, tableName string, fieldsToInclude string) ([]map[string]interface{}, error) {
+	return []map[string]interface{}{
+		{
+			"giantbomb_id": 10.0,
+			"id":           34,
 		},
 	}, nil
 }

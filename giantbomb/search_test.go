@@ -4,16 +4,30 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/corybuecker/steam-stats/ratelimiters"
 	"github.com/corybuecker/steam-stats/test"
 )
+
+type TestClock struct {
+	sleepDuration time.Duration
+}
+
+func (clock *TestClock) Sleep(d time.Duration) {
+	clock.sleepDuration = d
+}
+func (clock *TestClock) Now() time.Time {
+	return time.Date(2009, time.January, 1, 0, 0, 0, 0, time.UTC)
+}
 
 var fakeDatabase test.FakeDatabase
 
 type FakeFetcher struct{}
 
+var sampleResponse = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\"}]}"
+
 func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
-	var sampleResponse string = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\"}]}"
 	if err := json.Unmarshal([]byte(sampleResponse), data); err != nil {
 		return err
 	}
@@ -23,7 +37,7 @@ func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
 var gbFetcher Fetcher
 
 func init() {
-	gbFetcher = Fetcher{GiantBombAPIKey: "API KEY"}
+	gbFetcher = Fetcher{GiantBombAPIKey: "API KEY", RateLimiter: &ratelimiters.GiantBombRateLimiter{Clock: &TestClock{}}}
 }
 
 func TestURLIncludesAPIKey(t *testing.T) {
@@ -55,6 +69,21 @@ func TestDataUpdating(t *testing.T) {
 		t.Error(err)
 	}
 	if fakeDatabase.Entry["name"] != "foundgame" {
+		t.Error("expected the entry to have an ID of 10")
+	}
+}
+
+func TestFetchGameById(t *testing.T) {
+	sampleResponse = "{\"results\": [{\"id\": 10, \"name\": \"newgame\"}]}"
+
+	if err := gbFetcher.FindGameByID(&FakeFetcher{}, 10); err != nil {
+		t.Error(err)
+	}
+
+	if err := gbFetcher.UpdateFoundGames(&fakeDatabase); err != nil {
+		t.Error(err)
+	}
+	if fakeDatabase.Entry["name"] != "newgame" {
 		t.Error("expected the entry to have an ID of 10")
 	}
 }

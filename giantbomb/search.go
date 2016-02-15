@@ -13,6 +13,7 @@ import (
 type Search struct {
 	Results []SearchResult `json:"results"`
 }
+
 type SearchResult struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -25,8 +26,32 @@ type Fetcher struct {
 	RateLimiter     *ratelimiters.GiantBombRateLimiter
 }
 
+func (fetcher *Fetcher) generateFetchURL(id int) string {
+	return fmt.Sprintf("http://www.giantbomb.com/api/games/?filter=id:%d&api_key=%s&format=json&field_list=id,name,site_detail_url", id, fetcher.GiantBombAPIKey)
+}
+
 func (fetcher *Fetcher) generateSearchURL(name string) string {
 	return fmt.Sprintf("http://www.giantbomb.com/api/games/?api_key=%s&format=json&filter=name:%s&field_list=id,name,site_detail_url", fetcher.GiantBombAPIKey, url.QueryEscape(name))
+}
+
+func (fetcher *Fetcher) FindGameByID(jsonfetcher fetcher.Interface, id int) error {
+	if fetcher.RateLimiter == nil {
+		fetcher.RateLimiter = &ratelimiters.GiantBombRateLimiter{}
+	}
+
+	log.Printf("fetching %d in the GiantBomb API", id)
+
+	err := jsonfetcher.Fetch(fetcher.generateFetchURL(id), &fetcher.SearchResults)
+
+	if err := fetcher.RateLimiter.ObeyRateLimit(); err != nil {
+		return err
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.Interface, gameName string) error {

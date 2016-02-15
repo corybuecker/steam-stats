@@ -51,14 +51,29 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	var ownedGamesWithoutGiantBombID []string
+	var ownedGamesWithoutGiantBomb []string
 
-	if ownedGamesWithoutGiantBombID, err = steamFetcher.FetchOwnedGames(&rethinkDB); err != nil {
+	if ownedGamesWithoutGiantBomb, err = steamFetcher.FetchOwnedGamesWithoutGiantBomb(&rethinkDB); err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	for _, ownedGame := range ownedGamesWithoutGiantBombID {
+	for _, ownedGame := range ownedGamesWithoutGiantBomb {
 		if err := giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, ownedGame); err != nil {
+			log.Println(err.Error())
+		}
+		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {
+			log.Println(err.Error())
+		}
+	}
+
+	var ownedGamesWithGiantBombID []int
+
+	if ownedGamesWithGiantBombID, err = steamFetcher.FetchOwnedGamesGiantBombID(&rethinkDB); err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	for _, ownedGame := range ownedGamesWithGiantBombID {
+		if err := giantBombFetcher.FindGameByID(&fetcher.JSONFetcher{}, ownedGame); err != nil {
 			log.Println(err.Error())
 		}
 		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {

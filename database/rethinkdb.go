@@ -8,7 +8,8 @@ type Interface interface {
 	CreateDatabase(string) error
 	ListDatabases() ([]string, error)
 	ListTables(string) ([]string, error)
-	RowsWithoutField(string, string, string) ([]map[string]interface{}, error)
+	RowsWithoutFields(string, string, []string) ([]map[string]interface{}, error)
+	RowsWithField(string, string, string) ([]map[string]interface{}, error)
 	GetRow(string, string, string) (map[string]interface{}, error)
 }
 
@@ -62,13 +63,31 @@ func (rethinkDB *RethinkDB) ListTables(databaseName string) ([]string, error) {
 	}
 	return tables, nil
 }
-func (rethinkDB *RethinkDB) RowsWithoutField(databaseName string, tableName string, fieldToExclude string) ([]map[string]interface{}, error) {
+func (rethinkDB *RethinkDB) RowsWithoutFields(databaseName string, tableName string, fieldsToExclude []string) ([]map[string]interface{}, error) {
 	var rows []map[string]interface{}
 	var err error
 	var cursor *gorethink.Cursor
 
 	filterFunction := func(game gorethink.Term) gorethink.Term {
-		return game.HasFields(fieldToExclude).Eq(false)
+		return game.HasFields(fieldsToExclude).Eq(false)
+	}
+
+	if cursor, err = gorethink.DB(databaseName).Table(tableName).Filter(filterFunction).Run(rethinkDB.Session); err != nil {
+		return nil, err
+	}
+
+	if err = cursor.All(&rows); err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+func (rethinkDB *RethinkDB) RowsWithField(databaseName string, tableName string, fieldToInclude string) ([]map[string]interface{}, error) {
+	var rows []map[string]interface{}
+	var err error
+	var cursor *gorethink.Cursor
+
+	filterFunction := func(game gorethink.Term) gorethink.Term {
+		return game.HasFields(fieldToInclude).Eq(true)
 	}
 
 	if cursor, err = gorethink.DB(databaseName).Table(tableName).Filter(filterFunction).Run(rethinkDB.Session); err != nil {
