@@ -40,8 +40,8 @@ func (rethinkDB *FakeDatabase) RowsWithoutFields(databaseName string, tableName 
 func (rethinkDB *FakeDatabase) RowsWithField(databaseName string, tableName string, fieldsToInclude string) ([]map[string]interface{}, error) {
 	return []map[string]interface{}{
 		{
-			"giantbomb_id": 10.0,
-			"id":           34,
+			"giantbomb_id": float64(10),
+			"id":           float64(34),
 		},
 	}, nil
 }
