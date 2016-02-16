@@ -8,6 +8,7 @@ import (
 	"github.com/corybuecker/steam-stats/database"
 	"github.com/corybuecker/steam-stats/fetcher"
 	"github.com/corybuecker/steam-stats/giantbomb"
+	"github.com/corybuecker/steam-stats/jobs"
 	"github.com/corybuecker/steam-stats/steam"
 	"github.com/corybuecker/steam-stats/storage"
 	"github.com/dancannon/gorethink"
@@ -36,48 +37,12 @@ func main() {
 
 	var steamFetcher = &steam.Fetcher{SteamAPIKey: config.SteamAPIKey, SteamID: config.SteamID}
 	var giantBombFetcher = &giantbomb.Fetcher{GiantBombAPIKey: config.GiantBombAPIKey}
-
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
+	var job = &jobs.Job{Fetcher: &fetcher.JSONFetcher{}, Database: &rethinkDB}
 
 	storage.Setup(&rethinkDB, "videogames", []string{"ownedgames", "giantbomb"})
 
-	if err := steamFetcher.GetOwnedGames(&fetcher.JSONFetcher{}); err != nil {
-		log.Fatalln(err.Error())
-	}
+	job.OwnedGamesFetch(steamFetcher)
+	job.OwnedGamesSearch(steamFetcher, giantBombFetcher)
+	job.OwnedGamesFetchByID(steamFetcher, giantBombFetcher)
 
-	if err := steamFetcher.UpdateOwnedGames(&rethinkDB); err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	var ownedGamesWithoutGiantBomb []string
-
-	if ownedGamesWithoutGiantBomb, err = steamFetcher.FetchOwnedGamesWithoutGiantBomb(&rethinkDB); err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	for _, ownedGame := range ownedGamesWithoutGiantBomb {
-		if err := giantBombFetcher.FindOwnedGame(&fetcher.JSONFetcher{}, ownedGame); err != nil {
-			log.Println(err.Error())
-		}
-		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {
-			log.Println(err.Error())
-		}
-	}
-
-	var ownedGamesWithGiantBombID []int
-
-	if ownedGamesWithGiantBombID, err = steamFetcher.FetchOwnedGamesGiantBombID(&rethinkDB); err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	for _, ownedGame := range ownedGamesWithGiantBombID {
-		if err := giantBombFetcher.FindGameByID(&fetcher.JSONFetcher{}, ownedGame); err != nil {
-			log.Println(err.Error())
-		}
-		if err := giantBombFetcher.UpdateFoundGames(&rethinkDB); err != nil {
-			log.Println(err.Error())
-		}
-	}
 }
