@@ -50,6 +50,8 @@ func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 			"playtimeRecent":  ownedGame.PlaytimeRecent,
 		}
 
+		log.Printf("upserting %s games in the user's library", ownedGame.Name)
+
 		if err := database.Upsert("videogames", "ownedgames", ownedGameMap); err != nil {
 			return err
 		}

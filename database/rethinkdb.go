@@ -18,7 +18,7 @@ type RethinkDB struct {
 }
 
 func (rethinkDB *RethinkDB) Upsert(databaseName string, tableName string, record map[string]interface{}) error {
-	if _, err := gorethink.DB(databaseName).Table(tableName).Insert(record, gorethink.InsertOpts{Conflict: "update"}).RunWrite(rethinkDB.Session); err != nil {
+	if _, err := gorethink.DB(databaseName).Table(tableName).Insert(record, gorethink.InsertOpts{Conflict: "update", Durability: "soft"}).RunWrite(rethinkDB.Session); err != nil {
 		return err
 	}
 	return nil
