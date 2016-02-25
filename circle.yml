@@ -1,0 +1,3 @@
+notify:
+  webhooks:
+    - url: https://registry.hub.docker.com/u/corybuecker/steam-stats-fetcher/trigger/$DOCKER_HUB_TRIGGER/
