@@ -65,7 +65,7 @@ func (fetcher *Fetcher) FetchOwnedGamesWithoutGiantBomb(database database.Interf
 
 	var games = make([]string, 0)
 
-	if gamesList, err = database.RowsWithoutFields("videogames", "ownedgames", []string{"giantbomb", "giantbomb_id"}); err != nil {
+	if gamesList, err = database.RowsWithoutFields("videogames", "ownedgames", []string{"giantbomb", "giantbombId"}); err != nil {
 		return nil, err
 	}
 
@@ -82,12 +82,12 @@ func (fetcher *Fetcher) FetchOwnedGamesGiantBombID(database database.Interface) 
 
 	var games = make([]int, 0)
 
-	if gamesList, err = database.RowsWithField("videogames", "ownedgames", "giantbomb_id"); err != nil {
+	if gamesList, err = database.RowsWithField("videogames", "ownedgames", "giantbombId"); err != nil {
 		return nil, err
 	}
 
 	for _, game := range gamesList {
-		games = append(games, int(game["giantbomb_id"].(float64)))
+		games = append(games, int(game["giantbombId"].(float64)))
 	}
 
 	return games, nil
