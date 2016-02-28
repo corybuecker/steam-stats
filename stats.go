@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/corybuecker/steam-stats/configuration"
-	"github.com/corybuecker/steam-stats/database"
-	"github.com/corybuecker/steam-stats/fetcher"
-	"github.com/corybuecker/steam-stats/giantbomb"
-	"github.com/corybuecker/steam-stats/jobs"
-	"github.com/corybuecker/steam-stats/steam"
-	"github.com/corybuecker/steam-stats/storage"
+	"github.com/corybuecker/steam-stats-fetcher/configuration"
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steam-stats-fetcher/fetcher"
+	"github.com/corybuecker/steam-stats-fetcher/giantbomb"
+	"github.com/corybuecker/steam-stats-fetcher/jobs"
+	"github.com/corybuecker/steam-stats-fetcher/steam"
+	"github.com/corybuecker/steam-stats-fetcher/storage"
 	"github.com/dancannon/gorethink"
 )
 
@@ -29,7 +29,7 @@ func main() {
 
 	databaseHost := "localhost"
 	app := cli.NewApp()
-	app.Name = "steam-stats"
+	app.Name = "steam-stats-fetcher"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

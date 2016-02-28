@@ -3,7 +3,7 @@ package storage
 import (
 	"testing"
 
-	"github.com/corybuecker/steam-stats/test"
+	"github.com/corybuecker/steam-stats-fetcher/test"
 )
 
 var fakeDatabase test.FakeDatabase

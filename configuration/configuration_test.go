@@ -3,7 +3,7 @@ package configuration
 import (
 	"testing"
 
-	"github.com/corybuecker/steam-stats/test"
+	"github.com/corybuecker/steam-stats-fetcher/test"
 )
 
 func TestConfiguration(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/corybuecker/steam-stats/database"
-	"github.com/corybuecker/steam-stats/fetcher"
-	"github.com/corybuecker/steam-stats/ratelimiters"
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steam-stats-fetcher/fetcher"
+	"github.com/corybuecker/steam-stats-fetcher/ratelimiters"
 )
 
 type Search struct {

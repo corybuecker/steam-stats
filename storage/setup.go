@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/corybuecker/steam-stats/database"
+import "github.com/corybuecker/steam-stats-fetcher/database"
 
 // Setup will create any needed non-existant databases and tables.
 func Setup(databaseConnection database.Interface, database string, tables []string) error {

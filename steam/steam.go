@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/corybuecker/steam-stats/database"
-	"github.com/corybuecker/steam-stats/fetcher"
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steam-stats-fetcher/fetcher"
 )
 
 type Response struct {

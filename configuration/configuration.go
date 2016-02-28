@@ -1,6 +1,6 @@
 package configuration
 
-import "github.com/corybuecker/steam-stats/database"
+import "github.com/corybuecker/steam-stats-fetcher/database"
 
 type Configuration struct {
 	SteamAPIKey     string

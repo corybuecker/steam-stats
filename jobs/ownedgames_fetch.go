@@ -3,10 +3,10 @@ package jobs
 import (
 	"log"
 
-	"github.com/corybuecker/steam-stats/database"
-	"github.com/corybuecker/steam-stats/fetcher"
-	"github.com/corybuecker/steam-stats/giantbomb"
-	"github.com/corybuecker/steam-stats/steam"
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steam-stats-fetcher/fetcher"
+	"github.com/corybuecker/steam-stats-fetcher/giantbomb"
+	"github.com/corybuecker/steam-stats-fetcher/steam"
 )
 
 type Job struct {

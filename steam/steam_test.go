@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/corybuecker/steam-stats/test"
+	"github.com/corybuecker/steam-stats-fetcher/test"
 )
 
 type FakeFetcher struct{}

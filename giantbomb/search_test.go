@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/corybuecker/steam-stats/ratelimiters"
-	"github.com/corybuecker/steam-stats/test"
+	"github.com/corybuecker/steam-stats-fetcher/ratelimiters"
+	"github.com/corybuecker/steam-stats-fetcher/test"
 )
 
 type TestClock struct {
