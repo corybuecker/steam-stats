@@ -1,4 +1,4 @@
 # steam-stats-fetcher
 Steam and GiantBomb data fetcher
 
-[![Circle CI](https://circleci.com/gh/corybuecker/steam-stats-fetcher.svg?style=svg)](https://circleci.com/gh/corybuecker/steam-stats-fetcher)
+[![Build Status](https://travis-ci.org/corybuecker/steam-stats-fetcher.svg?branch=master)](https://travis-ci.org/corybuecker/steam-stats-fetcher)
