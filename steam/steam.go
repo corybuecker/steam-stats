@@ -23,8 +23,8 @@ type OwnedGames struct {
 }
 
 type Fetcher struct {
-	SteamAPIKey string
-	SteamID     string
+	SteamAPIKey string `gorethink:"steamApiKey"`
+	SteamID     string `gorethink:"steamId"`
 	OwnedGames  OwnedGames
 }
 
