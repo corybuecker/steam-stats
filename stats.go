@@ -7,7 +7,7 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/codegangsta/cli"
-	"github.com/corybuecker/goconfig"
+	"github.com/corybuecker/mgoconfig"
 	"github.com/corybuecker/steam-stats-fetcher/database"
 	"github.com/corybuecker/steam-stats-fetcher/fetcher"
 	"github.com/corybuecker/steam-stats-fetcher/giantbomb"
@@ -41,8 +41,8 @@ func main() {
 	var giantBombFetcher giantbomb.Fetcher
 	session, _ := mgo.Dial(databaseHost)
 
-	goconfig.Get(session, "steam", &steamFetcher)
-	goconfig.Get(session, "giantbomb", &giantBombFetcher)
+	mgoconfig.Get(session, "steam", &steamFetcher)
+	mgoconfig.Get(session, "giantbomb", &giantBombFetcher)
 
 	var job = &jobs.Job{Fetcher: &fetcher.JSONFetcher{}, Database: rethinkDB}
 
