@@ -59,25 +59,25 @@ func TestDataUpdating(t *testing.T) {
 }
 
 func TestFetching(t *testing.T) {
-	var games []string
+	var games map[int]string
 	var err error
 	if games, err = steamFetcher.FetchOwnedGamesWithoutGiantBomb(&fakeDatabase); err != nil {
 		t.Error(err)
 	}
 
-	if games[0] != "mario" {
+	if games[10] != "mario" {
 		t.Error("expected to have fetched the games")
 	}
 }
 
 func TestFetchingWithGB(t *testing.T) {
-	var games []int
+	var games map[int]int
 	var err error
 	if games, err = steamFetcher.FetchOwnedGamesGiantBombID(&fakeDatabase); err != nil {
 		t.Error(err)
 	}
 
-	if games[0] != 10 {
+	if games[34] != 10 {
 		t.Error("expected to have fetched the games")
 	}
 }
