@@ -2,6 +2,7 @@ package giantbomb
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ var fakeDatabase test.FakeDatabase
 
 type FakeFetcher struct{}
 
-var sampleResponse = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\"}]}"
+var sampleResponse = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\", \"site_detail_url\": \"foundgame.com\"}]}"
 
 func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
 	if err := json.Unmarshal([]byte(sampleResponse), data); err != nil {
@@ -65,25 +66,26 @@ func TestDataUpdating(t *testing.T) {
 	if err := gbFetcher.FindOwnedGame(&FakeFetcher{}, "gamename"); err != nil {
 		t.Error(err)
 	}
-	if err := gbFetcher.UpdateFoundGames(&fakeDatabase); err != nil {
+	if err := gbFetcher.UpdateFoundGames(1, &fakeDatabase); err != nil {
 		t.Error(err)
 	}
-	if fakeDatabase.Entry["name"] != "foundgame" {
+	log.Printf("%v", fakeDatabase.Entry)
+	if fakeDatabase.Entry["url"] != "foundgame.com" {
 		t.Error("expected the entry to have an ID of 10")
 	}
 }
 
 func TestFetchGameById(t *testing.T) {
-	sampleResponse = "{\"results\": [{\"id\": 10, \"name\": \"newgame\"}]}"
+	sampleResponse = "{\"results\": [{\"id\": 10, \"name\": \"newgame\", \"site_detail_url\": \"newgame.com\"}]}"
 
 	if err := gbFetcher.FindGameByID(&FakeFetcher{}, 10); err != nil {
 		t.Error(err)
 	}
 
-	if err := gbFetcher.UpdateFoundGames(&fakeDatabase); err != nil {
+	if err := gbFetcher.UpdateFoundGames(10, &fakeDatabase); err != nil {
 		t.Error(err)
 	}
-	if fakeDatabase.Entry["name"] != "newgame" {
+	if fakeDatabase.Entry["url"] != "newgame.com" {
 		t.Error("expected the entry to have an ID of 10")
 	}
 }

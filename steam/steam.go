@@ -23,8 +23,8 @@ type OwnedGames struct {
 }
 
 type Fetcher struct {
-	SteamAPIKey string `gorethink:"steamApiKey"`
-	SteamID     string `gorethink:"steamId"`
+	SteamAPIKey string `bson:"steam_api_key"`
+	SteamID     string `bson:"steam_id"`
 	OwnedGames  OwnedGames
 }
 
@@ -51,43 +51,42 @@ func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 		}
 
 		log.Printf("upserting %s games in the user's library", ownedGame.Name)
-
-		if err := database.Upsert("videogames", "ownedgames", ownedGameMap); err != nil {
+		if err := database.Upsert(map[string]interface{}{"id": ownedGame.ID}, ownedGameMap); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (fetcher *Fetcher) FetchOwnedGamesWithoutGiantBomb(database database.Interface) ([]string, error) {
+func (fetcher *Fetcher) FetchOwnedGamesWithoutGiantBomb(database database.Interface) (map[int]string, error) {
 	var gamesList []map[string]interface{}
 	var err error
 
-	var games = make([]string, 0)
+	var games = make(map[int]string)
 
-	if gamesList, err = database.RowsWithoutFields("videogames", "ownedgames", []string{"giantbomb", "giantbombId"}); err != nil {
+	if gamesList, err = database.RowsWithoutFields([]string{"giantbomb", "giantbombId"}); err != nil {
 		return nil, err
 	}
 
 	for _, game := range gamesList {
-		games = append(games, game["name"].(string))
+		games[game["id"].(int)] = game["name"].(string)
 	}
 
 	return games, nil
 }
 
-func (fetcher *Fetcher) FetchOwnedGamesGiantBombID(database database.Interface) ([]int, error) {
+func (fetcher *Fetcher) FetchOwnedGamesGiantBombID(database database.Interface) (map[int]int, error) {
 	var gamesList []map[string]interface{}
 	var err error
 
-	var games = make([]int, 0)
+	var games = make(map[int]int)
 
-	if gamesList, err = database.RowsWithField("videogames", "ownedgames", "giantbombId"); err != nil {
+	if gamesList, err = database.RowsWithField("giantbombId"); err != nil {
 		return nil, err
 	}
 
 	for _, game := range gamesList {
-		games = append(games, int(game["giantbombId"].(float64)))
+		games[game["id"].(int)] = game["giantbombId"].(int)
 	}
 
 	return games, nil
