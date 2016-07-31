@@ -21,7 +21,7 @@ type SearchResult struct {
 }
 
 type Fetcher struct {
-	GiantBombAPIKey string `gorethink:"giantbombApiKey"`
+	GiantBombAPIKey string `bson:"giantbombApiKey"`
 	SearchResults   Search
 	RateLimiter     *ratelimiters.GiantBombRateLimiter
 }

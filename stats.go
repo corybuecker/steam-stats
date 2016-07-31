@@ -15,13 +15,13 @@ import (
 	"github.com/corybuecker/steam-stats-fetcher/steam"
 )
 
-func getDatabase(databaseHost string) (database.Interface, error) {
+func getMongoSession(databaseHost string) (*mgo.Session, error) {
 	session, err := mgo.Dial(databaseHost)
 	if err != nil {
 		return nil, err
 	}
 	session.SetMode(mgo.Monotonic, true)
-	return &database.MongoDB{Collection: session.DB("test").C("steam_stats_fetcher")}, nil
+	return session, nil
 }
 
 func main() {
@@ -30,21 +30,23 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "steam-stats-fetcher"
 
-	var rethinkDB database.Interface
+	var mongoSession *mgo.Session
+	var mongoDatabase database.Interface
 	var err error
 
-	if rethinkDB, err = getDatabase(databaseHost); err != nil {
+	if mongoSession, err = getMongoSession(databaseHost); err != nil {
 		log.Fatal(err)
 	}
 
+	mongoDatabase = &database.MongoDB{Collection: mongoSession.DB("test").C("steam_stats_fetcher")}
+
 	var steamFetcher steam.Fetcher
 	var giantBombFetcher giantbomb.Fetcher
-	session, _ := mgo.Dial(databaseHost)
 
-	mgoconfig.Get(session, "steam", &steamFetcher)
-	mgoconfig.Get(session, "giantbomb", &giantBombFetcher)
+	mgoconfig.Get(mongoSession, "steam", &steamFetcher)
+	mgoconfig.Get(mongoSession, "giantbomb", &giantBombFetcher)
 
-	var job = &jobs.Job{Fetcher: &fetcher.JSONFetcher{}, Database: rethinkDB}
+	var job = &jobs.Job{Fetcher: &fetcher.JSONFetcher{}, Database: mongoDatabase}
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
