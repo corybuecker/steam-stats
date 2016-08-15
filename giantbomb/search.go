@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/steam-stats-fetcher/database"
-	"github.com/corybuecker/steam-stats-fetcher/fetcher"
 	"github.com/corybuecker/steam-stats-fetcher/ratelimiters"
 )
 
@@ -24,6 +24,7 @@ type Fetcher struct {
 	GiantBombAPIKey string `bson:"giantbombApiKey"`
 	SearchResults   Search
 	RateLimiter     *ratelimiters.GiantBombRateLimiter
+	Jsonfetcher     jsonfetcher.Fetcher
 }
 
 func (fetcher *Fetcher) generateFetchURL(id int) string {
@@ -38,14 +39,14 @@ func (fetcher *Fetcher) generateSearchURL(name string) string {
 		url.QueryEscape(name))
 }
 
-func (fetcher *Fetcher) FindGameByID(jsonfetcher fetcher.Interface, id int) error {
+func (fetcher *Fetcher) FindGameByID(id int) error {
 	if fetcher.RateLimiter == nil {
 		fetcher.RateLimiter = &ratelimiters.GiantBombRateLimiter{}
 	}
 
 	log.Printf("fetching %d in the GiantBomb API", id)
 
-	err := jsonfetcher.Fetch(fetcher.generateFetchURL(id), &fetcher.SearchResults)
+	err := fetcher.Jsonfetcher.Fetch(fetcher.generateFetchURL(id), &fetcher.SearchResults)
 
 	if err := fetcher.RateLimiter.ObeyRateLimit(); err != nil {
 		return err
@@ -58,14 +59,14 @@ func (fetcher *Fetcher) FindGameByID(jsonfetcher fetcher.Interface, id int) erro
 	return nil
 }
 
-func (fetcher *Fetcher) FindOwnedGame(jsonfetcher fetcher.Interface, gameName string) error {
+func (fetcher *Fetcher) FindOwnedGame(gameName string) error {
 	if fetcher.RateLimiter == nil {
 		fetcher.RateLimiter = &ratelimiters.GiantBombRateLimiter{}
 	}
 
 	log.Printf("searching for %s in the GiantBomb API", gameName)
 
-	if err := jsonfetcher.Fetch(fetcher.generateSearchURL(gameName), &fetcher.SearchResults); err != nil {
+	if err := fetcher.Jsonfetcher.Fetch(fetcher.generateSearchURL(gameName), &fetcher.SearchResults); err != nil {
 		return err
 	}
 

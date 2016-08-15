@@ -24,21 +24,26 @@ func (clock *TestClock) Now() time.Time {
 
 var fakeDatabase test.FakeDatabase
 
-type FakeFetcher struct{}
+type fakejsonfetcher struct {
+	response string
+}
 
-var sampleResponse = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\", \"site_detail_url\": \"foundgame.com\"}]}"
-
-func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
-	if err := json.Unmarshal([]byte(sampleResponse), data); err != nil {
+func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) error {
+	if err := json.Unmarshal([]byte(jsonfetcher.response), destination); err != nil {
 		return err
 	}
 	return nil
 }
 
+var sampleResponse = "{\"results\": [{\"id\": 1, \"name\": \"foundgame\", \"site_detail_url\": \"foundgame.com\"}]}"
+
 var gbFetcher Fetcher
 
 func init() {
 	gbFetcher = Fetcher{GiantBombAPIKey: "API KEY", RateLimiter: &ratelimiters.GiantBombRateLimiter{Clock: &TestClock{}}}
+	gbFetcher.Jsonfetcher = &fakejsonfetcher{
+		response: sampleResponse,
+	}
 }
 
 func TestURLIncludesAPIKey(t *testing.T) {
@@ -53,17 +58,8 @@ func TestURLIncludesSearchName(t *testing.T) {
 	}
 }
 
-func TestDataMarshalling(t *testing.T) {
-	if err := gbFetcher.FindOwnedGame(&FakeFetcher{}, "gamename"); err != nil {
-		t.Error(err)
-	}
-	if gbFetcher.SearchResults.Results[0].ID != 1 {
-		t.Error("expected ID of 1")
-	}
-}
-
 func TestDataUpdating(t *testing.T) {
-	if err := gbFetcher.FindOwnedGame(&FakeFetcher{}, "gamename"); err != nil {
+	if err := gbFetcher.FindOwnedGame("gamename"); err != nil {
 		t.Error(err)
 	}
 	if err := gbFetcher.UpdateFoundGames(1, &fakeDatabase); err != nil {
@@ -78,7 +74,11 @@ func TestDataUpdating(t *testing.T) {
 func TestFetchGameById(t *testing.T) {
 	sampleResponse = "{\"results\": [{\"id\": 10, \"name\": \"newgame\", \"site_detail_url\": \"newgame.com\"}]}"
 
-	if err := gbFetcher.FindGameByID(&FakeFetcher{}, 10); err != nil {
+	gbFetcher.Jsonfetcher = &fakejsonfetcher{
+		response: sampleResponse,
+	}
+
+	if err := gbFetcher.FindGameByID(10); err != nil {
 		t.Error(err)
 	}
 

@@ -8,22 +8,28 @@ import (
 	"github.com/corybuecker/steam-stats-fetcher/test"
 )
 
-type FakeFetcher struct{}
+var steamFetcher Fetcher
+var fakeDatabase test.FakeDatabase
 
-func (fetcher *FakeFetcher) Fetch(url string, data interface{}) error {
-	var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
-	if err := json.Unmarshal([]byte(sampleResponse), data); err != nil {
+var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+
+type fakejsonfetcher struct {
+	response string
+}
+
+func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) error {
+	if err := json.Unmarshal([]byte(jsonfetcher.response), destination); err != nil {
 		return err
 	}
 	return nil
 }
 
-var steamFetcher Fetcher
-var fakeDatabase test.FakeDatabase
-
 func init() {
 	fakeDatabase = test.FakeDatabase{}
 	steamFetcher = Fetcher{SteamAPIKey: "API KEY", SteamID: "ID"}
+	steamFetcher.Jsonfetcher = &fakejsonfetcher{
+		response: sampleResponse,
+	}
 }
 
 func TestURLIncludesAPIKey(t *testing.T) {
@@ -38,7 +44,7 @@ func TestURLIncludesSteamID(t *testing.T) {
 }
 
 func TestDataMarshalling(t *testing.T) {
-	if err := steamFetcher.GetOwnedGames(&FakeFetcher{}); err != nil {
+	if err := steamFetcher.GetOwnedGames(); err != nil {
 		t.Error(err)
 	}
 	if steamFetcher.OwnedGames.Response.Games[0].ID != 10 {
@@ -47,7 +53,7 @@ func TestDataMarshalling(t *testing.T) {
 }
 
 func TestDataUpdating(t *testing.T) {
-	if err := steamFetcher.GetOwnedGames(&FakeFetcher{}); err != nil {
+	if err := steamFetcher.GetOwnedGames(); err != nil {
 		t.Error(err)
 	}
 	if err := steamFetcher.UpdateOwnedGames(&fakeDatabase); err != nil {
