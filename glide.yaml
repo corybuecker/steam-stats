@@ -1,0 +1,8 @@
+package: github.com/corybuecker/steam-stats-fetcher
+import:
+- package: github.com/corybuecker/jsonfetcher
+- package: github.com/corybuecker/mgoconfig
+- package: github.com/urfave/cli
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson
