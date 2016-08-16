@@ -38,13 +38,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mongoDatabase = &database.MongoDB{Collection: mongoSession.DB("test").C("steam_stats_fetcher")}
+	mongoDatabase = &database.MongoDB{Collection: mongoSession.DB("steam_stats_fetcher").C("games")}
 
 	var steamFetcher steam.Fetcher
 	var giantBombFetcher giantbomb.Fetcher
 
-	mgoconfig.Get(mongoSession, "steam", &steamFetcher)
-	mgoconfig.Get(mongoSession, "giantbomb", &giantBombFetcher)
+	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", &steamFetcher)
+	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "giantbomb", &giantBombFetcher)
 
 	steamFetcher.Jsonfetcher = &jsonfetcher.Jsonfetcher{}
 	giantBombFetcher.Jsonfetcher = &jsonfetcher.Jsonfetcher{}
