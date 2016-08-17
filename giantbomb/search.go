@@ -78,6 +78,11 @@ func (fetcher *Fetcher) FindOwnedGame(gameName string) error {
 }
 
 func (fetcher *Fetcher) UpdateFoundGames(id int, database database.Interface) error {
+	if len(fetcher.SearchResults.Results) > 1 {
+		log.Printf("more than one result was found for this game, skipping")
+		return nil
+	}
+
 	for _, foundGame := range fetcher.SearchResults.Results {
 		foundGameMap := map[string]interface{}{
 			"giantbombId": foundGame.ID,

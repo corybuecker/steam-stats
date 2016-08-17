@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/corybuecker/steam-stats-fetcher/ratelimiters"
 	"github.com/corybuecker/steam-stats-fetcher/test"
 )
@@ -69,6 +71,22 @@ func TestDataUpdating(t *testing.T) {
 	if fakeDatabase.Entry["url"] != "foundgame.com" {
 		t.Error("expected the entry to have an ID of 10")
 	}
+}
+
+func TestDataUpdatingWithMoreThanOneResponse(t *testing.T) {
+	fakeDatabase.Entry = nil
+	sampleResponse = "{\"results\": [{\"id\": 10, \"name\": \"newgame\", \"site_detail_url\": \"newgame.com\"}, {\"id\": 11, \"name\": \"newgame 2\", \"site_detail_url\": \"newgame.com\"}]}"
+
+	gbFetcher.Jsonfetcher = &fakejsonfetcher{
+		response: sampleResponse,
+	}
+	if err := gbFetcher.FindOwnedGame("newgame"); err != nil {
+		t.Error(err)
+	}
+	if err := gbFetcher.UpdateFoundGames(10, &fakeDatabase); err != nil {
+		t.Error(err)
+	}
+	assert.Empty(t, fakeDatabase.Entry, "should be empty")
 }
 
 func TestFetchGameById(t *testing.T) {
