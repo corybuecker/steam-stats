@@ -8,9 +8,8 @@ import (
 
 	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/mgoconfig"
+	"github.com/corybuecker/steam-stats-fetcher/actions"
 	"github.com/corybuecker/steam-stats-fetcher/database"
-	"github.com/corybuecker/steam-stats-fetcher/giantbomb"
-	"github.com/corybuecker/steam-stats-fetcher/jobs"
 	"github.com/corybuecker/steam-stats-fetcher/steam"
 	"github.com/urfave/cli"
 )
@@ -41,15 +40,10 @@ func main() {
 	mongoDatabase = &database.MongoDB{Collection: mongoSession.DB("steam_stats_fetcher").C("games")}
 
 	var steamFetcher steam.Fetcher
-	var giantBombFetcher giantbomb.Fetcher
 
 	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", &steamFetcher)
-	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "giantbomb", &giantBombFetcher)
 
 	steamFetcher.Jsonfetcher = &jsonfetcher.Jsonfetcher{}
-	giantBombFetcher.Jsonfetcher = &jsonfetcher.Jsonfetcher{}
-
-	var job = &jobs.Job{Database: mongoDatabase}
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -65,25 +59,7 @@ func main() {
 			Name:  "steam",
 			Usage: "update all owned games from steam",
 			Action: func(c *cli.Context) error {
-				job.OwnedGamesFetch(&steamFetcher)
-				return nil
-			},
-		},
-
-		{
-			Name:  "search",
-			Usage: "search for the name of all owned games in GiantBomb",
-			Action: func(c *cli.Context) error {
-				job.OwnedGamesSearch(&steamFetcher, &giantBombFetcher)
-				return nil
-			},
-		},
-
-		{
-			Name:  "fetch",
-			Usage: "fetch all known games from GiantBomb",
-			Action: func(c *cli.Context) error {
-				job.OwnedGamesFetchByID(&steamFetcher, &giantBombFetcher)
+				actions.UpdateSteam(&steamFetcher, mongoDatabase)
 				return nil
 			},
 		},
