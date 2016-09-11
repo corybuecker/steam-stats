@@ -8,32 +8,35 @@ import (
 	"github.com/corybuecker/steam-stats-fetcher/database"
 )
 
-type Response struct {
-	Games []OwnedGame `json:"games"`
-}
-type OwnedGame struct {
+type ownedGame struct {
 	ID              int    `json:"appid"`
 	Name            string `json:"name"`
 	PlaytimeForever int    `json:"playtime_forever"`
 	PlaytimeRecent  int    `json:"playtime_2weeks"`
 }
 
-type OwnedGames struct {
-	Response Response `json:"response"`
+type ownedGames struct {
+	Response struct {
+		Games []ownedGame `json:"games"`
+	} `json:"response"`
 }
 
 type Fetcher struct {
-	SteamAPIKey string `bson:"steam_api_key"`
-	SteamID     string `bson:"steam_id"`
-	OwnedGames  OwnedGames
+	Configuration struct {
+		SteamAPIKey string `bson:"steam_api_key"`
+		SteamID     string `bson:"steam_id"`
+	}
+	OwnedGames  ownedGames
 	Jsonfetcher jsonfetcher.Fetcher
 }
 
 func (fetcher *Fetcher) generateURL() string {
-	return fmt.Sprintf("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json&include_appinfo=1&include_played_free_games=1", fetcher.SteamAPIKey, fetcher.SteamID)
+	return fmt.Sprintf("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=%s&steamid=%s&format=json&include_appinfo=1&include_played_free_games=1", fetcher.Configuration.SteamAPIKey, fetcher.Configuration.SteamID)
 }
 
 func (fetcher *Fetcher) GetOwnedGames() error {
+	log.Printf("fetching from %s", fetcher.generateURL())
+	log.Printf("fetching from %+v", fetcher)
 	if err := fetcher.Jsonfetcher.Fetch(fetcher.generateURL(), &fetcher.OwnedGames); err != nil {
 		return err
 	}

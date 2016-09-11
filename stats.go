@@ -43,7 +43,7 @@ func main() {
 		Jsonfetcher: &jsonfetcher.Jsonfetcher{},
 	}
 
-	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", steamFetcher)
+	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", &steamFetcher.Configuration)
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -64,5 +64,6 @@ func main() {
 			},
 		},
 	}
+
 	app.Run(os.Args)
 }

@@ -11,7 +11,7 @@ import (
 var steamFetcher Fetcher
 var fakeDatabase test.FakeDatabase
 
-var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
 
 type fakejsonfetcher struct {
 	response string
@@ -26,7 +26,15 @@ func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) e
 
 func init() {
 	fakeDatabase = test.FakeDatabase{}
-	steamFetcher = Fetcher{SteamAPIKey: "API KEY", SteamID: "ID"}
+	steamFetcher = Fetcher{
+		Configuration: struct {
+			SteamAPIKey string `bson:"steam_api_key"`
+			SteamID     string `bson:"steam_id"`
+		}{
+			SteamAPIKey: "API KEY",
+			SteamID:     "ID",
+		},
+	}
 	steamFetcher.Jsonfetcher = &fakejsonfetcher{
 		response: sampleResponse,
 	}

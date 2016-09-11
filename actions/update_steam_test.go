@@ -26,7 +26,7 @@ func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) e
 
 func init() {
 	fakeDatabase = test.FakeDatabase{}
-	steamFetcher = steam.Fetcher{SteamAPIKey: "API KEY", SteamID: "ID"}
+	steamFetcher = steam.Fetcher{}
 	steamFetcher.Jsonfetcher = &fakejsonfetcher{
 		response: sampleResponse,
 	}
