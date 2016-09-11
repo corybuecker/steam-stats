@@ -1,29 +1,17 @@
 hash: 2eeb033690d53d18b555e3f459afd3450a12e6368edec49da40880ec5b877d2b
-updated: 2016-08-16T19:06:47.947507349-05:00
+updated: 2016-09-11T18:07:58.65607708-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
 - name: github.com/corybuecker/mgoconfig
-  version: 2e0d60127ba5650527a9945465e4d706f3253241
+  version: 1eab6dc5fd9023a6c62c3c122218320852f62354
 - name: github.com/urfave/cli
-  version: 168c95418e66e019fe17b8f4f5c45aa62ff80e23
+  version: 86b8c43eaf9af06ec2a4cb367888d885e27651ba
 - name: gopkg.in/mgo.v2
-  version: 01084657862d7b12d3b10ffd0394357abf8f8bc2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
+  - internal/json
   - internal/sasl
   - internal/scram
-  - internal/json
-testImports:
-- name: github.com/davecgh/go-spew
-  version: 6cf5744a041a0022271cefed95ba843f6d87fd51
-  subpackages:
-  - spew
-- name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
-  subpackages:
-  - difflib
-- name: github.com/stretchr/testify
-  version: d77da356e56a7428ad25149ca77381849a6a5232
-  subpackages:
-  - assert
+testImports: []

@@ -11,7 +11,7 @@ import (
 var steamFetcher Fetcher
 var fakeDatabase test.FakeDatabase
 
-var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
 
 type fakejsonfetcher struct {
 	response string
@@ -26,7 +26,15 @@ func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) e
 
 func init() {
 	fakeDatabase = test.FakeDatabase{}
-	steamFetcher = Fetcher{SteamAPIKey: "API KEY", SteamID: "ID"}
+	steamFetcher = Fetcher{
+		Configuration: struct {
+			SteamAPIKey string `bson:"steam_api_key"`
+			SteamID     string `bson:"steam_id"`
+		}{
+			SteamAPIKey: "API KEY",
+			SteamID:     "ID",
+		},
+	}
 	steamFetcher.Jsonfetcher = &fakejsonfetcher{
 		response: sampleResponse,
 	}
@@ -61,29 +69,5 @@ func TestDataUpdating(t *testing.T) {
 	}
 	if fakeDatabase.Entry["id"] != 10 {
 		t.Error("expected the entry to have an ID of 10")
-	}
-}
-
-func TestFetching(t *testing.T) {
-	var games map[int]string
-	var err error
-	if games, err = steamFetcher.FetchOwnedGamesWithoutGiantBomb(&fakeDatabase); err != nil {
-		t.Error(err)
-	}
-
-	if games[10] != "mario" {
-		t.Error("expected to have fetched the games")
-	}
-}
-
-func TestFetchingWithGB(t *testing.T) {
-	var games map[int]int
-	var err error
-	if games, err = steamFetcher.FetchOwnedGamesGiantBombID(&fakeDatabase); err != nil {
-		t.Error(err)
-	}
-
-	if games[34] != 10 {
-		t.Error("expected to have fetched the games")
 	}
 }
