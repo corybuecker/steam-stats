@@ -39,17 +39,17 @@ func main() {
 
 	mongoDatabase = &database.MongoDB{Collection: mongoSession.DB("steam_stats_fetcher").C("games")}
 
-	var steamFetcher steam.Fetcher
+	steamFetcher := &steam.Fetcher{
+		Jsonfetcher: &jsonfetcher.Jsonfetcher{},
+	}
 
-	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", &steamFetcher)
-
-	steamFetcher.Jsonfetcher = &jsonfetcher.Jsonfetcher{}
+	mgoconfig.Get(mongoSession, "steam_stats_fetcher", "steam", steamFetcher)
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "host",
 			Value:       "localhost",
-			Usage:       "connection host for RethinkDB",
+			Usage:       "connection host for MongoDB",
 			Destination: &databaseHost,
 		},
 	}
@@ -59,7 +59,7 @@ func main() {
 			Name:  "steam",
 			Usage: "update all owned games from steam",
 			Action: func(c *cli.Context) error {
-				actions.UpdateSteam(&steamFetcher, mongoDatabase)
+				actions.UpdateSteam(steamFetcher, mongoDatabase)
 				return nil
 			},
 		},

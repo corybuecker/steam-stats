@@ -58,37 +58,3 @@ func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 	}
 	return nil
 }
-
-func (fetcher *Fetcher) FetchOwnedGamesWithoutGiantBomb(database database.Interface) (map[int]string, error) {
-	var gamesList []map[string]interface{}
-	var err error
-
-	var games = make(map[int]string)
-
-	if gamesList, err = database.RowsWithoutFields([]string{"giantbomb", "giantbombId"}); err != nil {
-		return nil, err
-	}
-
-	for _, game := range gamesList {
-		games[game["id"].(int)] = game["name"].(string)
-	}
-
-	return games, nil
-}
-
-func (fetcher *Fetcher) FetchOwnedGamesGiantBombID(database database.Interface) (map[int]int, error) {
-	var gamesList []map[string]interface{}
-	var err error
-
-	var games = make(map[int]int)
-
-	if gamesList, err = database.RowsWithField("giantbombId"); err != nil {
-		return nil, err
-	}
-
-	for _, game := range gamesList {
-		games[game["id"].(int)] = game["giantbombId"].(int)
-	}
-
-	return games, nil
-}
