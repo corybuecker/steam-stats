@@ -35,8 +35,6 @@ func (fetcher *Fetcher) generateURL() string {
 }
 
 func (fetcher *Fetcher) GetOwnedGames() error {
-	log.Printf("fetching from %s", fetcher.generateURL())
-	log.Printf("fetching from %+v", fetcher)
 	if err := fetcher.Jsonfetcher.Fetch(fetcher.generateURL(), &fetcher.OwnedGames); err != nil {
 		return err
 	}
