@@ -3,6 +3,7 @@ package steam
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/steam-stats-fetcher/database"
@@ -53,7 +54,7 @@ func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 		}
 
 		log.Printf("upserting %s games in the user's library", ownedGame.Name)
-		if err := database.Upsert(map[string]interface{}{"id": ownedGame.ID}, ownedGameMap); err != nil {
+		if err := database.Upsert(strconv.Itoa(ownedGame.ID), ownedGameMap); err != nil {
 			return err
 		}
 	}
