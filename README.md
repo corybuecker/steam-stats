@@ -5,6 +5,8 @@ A Go-based client to fetch a user's games from the Steam API and store the resul
 Setting up the configuration
 ----------------------------
 
+Get a Steam API key from http://steamcommunity.com/dev/registerkey. You can find your Steam ID at http://steamrep.com.
+
     use steam_stats_fetcher
 
     db.configuration.update({"id": "steam"}, {"steam_api_key": "<your steam api key>", id: "steam", steam_id: "<your steam id>"}, {"upsert": true})
