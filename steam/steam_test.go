@@ -2,16 +2,18 @@ package steam
 
 import (
 	"encoding/json"
-	"strings"
+	"log"
 	"testing"
 
-	"github.com/corybuecker/steam-stats-fetcher/test"
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/stretchr/testify/assert"
+
+	mgo "gopkg.in/mgo.v2"
 )
 
 var steamFetcher Fetcher
-var fakeDatabase test.FakeDatabase
 
-var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"name\": \"game\", \"playtime_forever\": 32}]}}"
 
 type fakejsonfetcher struct {
 	response string
@@ -24,8 +26,19 @@ func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) e
 	return nil
 }
 
+var session *mgo.Session
+var err error
+var mongoDB *database.MongoDB
+
 func init() {
-	fakeDatabase = test.FakeDatabase{}
+	session, err = mgo.Dial("localhost:27017")
+	if err != nil {
+		log.Fatal(err)
+	}
+	session.SetMode(mgo.Monotonic, true)
+
+	mongoDB = &database.MongoDB{Collection: session.DB("test").C("games")}
+
 	steamFetcher = Fetcher{
 		Configuration: struct {
 			SteamAPIKey string `bson:"steam_api_key"`
@@ -41,33 +54,26 @@ func init() {
 }
 
 func TestURLIncludesAPIKey(t *testing.T) {
-	if strings.Contains(steamFetcher.generateURL(), "API KEY") != true {
-		t.Error("expected URL to contain API KEY")
-	}
+	assert.Contains(t, steamFetcher.generateURL(), "API KEY", "should include the steam api key")
+
 }
 func TestURLIncludesSteamID(t *testing.T) {
-	if strings.Contains(steamFetcher.generateURL(), "ID") != true {
-		t.Error("expected URL to contain Steam ID")
-	}
+	assert.Contains(t, steamFetcher.generateURL(), "ID", "should include the steam ID")
 }
 
 func TestDataMarshalling(t *testing.T) {
-	if err := steamFetcher.GetOwnedGames(); err != nil {
-		t.Error(err)
-	}
-	if steamFetcher.OwnedGames.Response.Games[0].ID != 10 {
-		t.Error("expected ID of 10")
-	}
+	steamFetcher.GetOwnedGames()
+	assert.Equal(t, 10, steamFetcher.OwnedGames.Response.Games[0].ID, "should be equal")
 }
 
 func TestDataUpdating(t *testing.T) {
 	if err := steamFetcher.GetOwnedGames(); err != nil {
 		t.Error(err)
 	}
-	if err := steamFetcher.UpdateOwnedGames(&fakeDatabase); err != nil {
+	if err := steamFetcher.UpdateOwnedGames(mongoDB); err != nil {
 		t.Error(err)
 	}
-	if fakeDatabase.Entry["id"] != 10 {
-		t.Error("expected the entry to have an ID of 10")
-	}
+
+	result, _ := mongoDB.GetInt("steam_id", 10)
+	assert.Equal(t, "game", result["name"], "should have been equal")
 }

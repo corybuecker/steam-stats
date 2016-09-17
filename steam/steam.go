@@ -3,17 +3,16 @@ package steam
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/steam-stats-fetcher/database"
 )
 
 type ownedGame struct {
-	ID              int    `json:"appid"`
-	Name            string `json:"name"`
-	PlaytimeForever int    `json:"playtime_forever"`
-	PlaytimeRecent  int    `json:"playtime_2weeks"`
+	ID              int    `json:"appid" bson:"steam_id"`
+	Name            string `json:"name" bson:"name"`
+	PlaytimeForever int    `json:"playtime_forever" bson:"playtimeForever"`
+	PlaytimeRecent  int    `json:"playtime_2weeks" bson:"playtimeRecent"`
 }
 
 type ownedGames struct {
@@ -46,15 +45,10 @@ func (fetcher *Fetcher) GetOwnedGames() error {
 }
 func (fetcher *Fetcher) UpdateOwnedGames(database database.Interface) error {
 	for _, ownedGame := range fetcher.OwnedGames.Response.Games {
-		ownedGameMap := map[string]interface{}{
-			"id":              ownedGame.ID,
-			"name":            ownedGame.Name,
-			"playtimeForever": ownedGame.PlaytimeForever,
-			"playtimeRecent":  ownedGame.PlaytimeRecent,
-		}
 
 		log.Printf("upserting %s games in the user's library", ownedGame.Name)
-		if err := database.Upsert(strconv.Itoa(ownedGame.ID), ownedGameMap); err != nil {
+
+		if err := database.UpsertIntField("steam_id", ownedGame.ID, ownedGame); err != nil {
 			return err
 		}
 	}

@@ -2,16 +2,19 @@ package actions
 
 import (
 	"encoding/json"
+	"log"
 	"testing"
 
+	"github.com/corybuecker/steam-stats-fetcher/database"
 	"github.com/corybuecker/steam-stats-fetcher/steam"
-	"github.com/corybuecker/steam-stats-fetcher/test"
+	"github.com/stretchr/testify/assert"
+
+	mgo "gopkg.in/mgo.v2"
 )
 
 var steamFetcher steam.Fetcher
-var fakeDatabase test.FakeDatabase
 
-var sampleResponse string = "{\"response\": {\"games\": [{\"appid\": 10, \"playtime_forever\": 32}]}}"
+var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"name\": \"game\", \"playtime_forever\": 32}]}}"
 
 type fakejsonfetcher struct {
 	response string
@@ -24,18 +27,35 @@ func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) e
 	return nil
 }
 
+var session *mgo.Session
+var err error
+var mongoDB *database.MongoDB
+
 func init() {
-	fakeDatabase = test.FakeDatabase{}
-	steamFetcher = steam.Fetcher{}
+	session, err = mgo.Dial("localhost:27017")
+	if err != nil {
+		log.Fatal(err)
+	}
+	session.SetMode(mgo.Monotonic, true)
+
+	mongoDB = &database.MongoDB{Collection: session.DB("test").C("games")}
+
+	steamFetcher = steam.Fetcher{
+		Configuration: struct {
+			SteamAPIKey string `bson:"steam_api_key"`
+			SteamID     string `bson:"steam_id"`
+		}{
+			SteamAPIKey: "API KEY",
+			SteamID:     "ID",
+		},
+	}
 	steamFetcher.Jsonfetcher = &fakejsonfetcher{
 		response: sampleResponse,
 	}
 }
 
-func TestUpdateSteam(t *testing.T) {
-	UpdateSteam(&steamFetcher, &fakeDatabase)
-
-	if fakeDatabase.Entry["id"] != 10 {
-		t.Error("expected the entry to have an ID of 10")
-	}
+func TestDataUpdating(t *testing.T) {
+	UpdateSteam(&steamFetcher, mongoDB)
+	result, _ := mongoDB.GetInt("steam_id", 10)
+	assert.Equal(t, "game", result["name"], "should have been equal")
 }

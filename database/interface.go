@@ -1,5 +1,6 @@
 package database
 
 type Interface interface {
-	Upsert(string, map[string]interface{}) error
+	GetInt(string, int) (map[string]interface{}, error)
+	UpsertIntField(string, int, interface{}) error
 }
