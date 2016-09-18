@@ -3,3 +3,9 @@ go:
   - 1.7
 services:
   - mongodb
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
