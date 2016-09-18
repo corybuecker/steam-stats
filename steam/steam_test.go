@@ -37,8 +37,8 @@ func init() {
 	}
 	session.SetMode(mgo.Monotonic, true)
 
-	mongoDB = &database.MongoDB{Collection: session.DB("test").C("games")}
-
+	mongoDB = &database.MongoDB{Collection: session.DB("steam_stats_fetcher_test").C("steam_test")}
+	mongoDB.Collection.DropCollection()
 	steamFetcher = Fetcher{
 		Configuration: struct {
 			SteamAPIKey string `bson:"steam_api_key"`
@@ -68,12 +68,15 @@ func TestDataMarshalling(t *testing.T) {
 
 func TestDataUpdating(t *testing.T) {
 	if err := steamFetcher.GetOwnedGames(); err != nil {
-		t.Error(err)
+		log.Fatalln(err)
 	}
 	if err := steamFetcher.UpdateOwnedGames(mongoDB); err != nil {
-		t.Error(err)
+		log.Fatalln(err)
 	}
 
-	result, _ := mongoDB.GetInt("steam_id", 10)
-	assert.Equal(t, "game", result["name"], "should have been equal")
+	if result, err := mongoDB.GetInt("steam_id", 10); err != nil {
+		log.Fatal(err)
+	} else {
+		assert.Equal(t, "game", result["name"], "should have been equal")
+	}
 }

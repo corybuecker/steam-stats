@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 
 	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/mgoconfig"
