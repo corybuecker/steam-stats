@@ -20,7 +20,7 @@ func init() {
 	}
 	session.SetMode(mgo.Monotonic, true)
 
-	mongoDB = &MongoDB{Collection: session.DB("steam_stats_fetcher_test").C("mongodb_test")}
+	mongoDB = &MongoDB{session: session, Collection: session.DB("steam_stats_fetcher_test").C("mongodb_test")}
 }
 
 func TestRunner(t *testing.T) {
@@ -29,6 +29,7 @@ func TestRunner(t *testing.T) {
 	t.Run("upsert int field with existing data", testUpsertIntFieldWithExistingData)
 	t.Run("upsert int field with error", testUpsertIntFieldWithError)
 	t.Run("get int with error", testGetIntWithError)
+	t.Run("get session", testGetSession)
 }
 
 func testUpsertIntFieldWithNewData(t *testing.T) {
@@ -51,4 +52,9 @@ func testUpsertIntFieldWithError(t *testing.T) {
 func testGetIntWithError(t *testing.T) {
 	_, err := mongoDB.GetInt("", 1)
 	assert.EqualError(t, err, "not found")
+}
+
+func testGetSession(t *testing.T) {
+	session := mongoDB.GetSession()
+	assert.Equal(t, mongoDB.session, session)
 }

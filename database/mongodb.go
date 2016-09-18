@@ -6,7 +6,16 @@ import (
 )
 
 type MongoDB struct {
+	session    *mgo.Session
 	Collection *mgo.Collection
+}
+
+func (mongoDB *MongoDB) SetSession(session *mgo.Session) {
+	mongoDB.session = session
+}
+
+func (mongoDB *MongoDB) GetSession() *mgo.Session {
+	return mongoDB.session
 }
 
 func (mongoDB *MongoDB) UpsertIntField(field string, searchValue int, record interface{}) error {

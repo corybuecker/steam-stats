@@ -1,5 +1,5 @@
 hash: adaca28b2a4f324503b9590729dd9ed6f15a49c9dbba1652278e23e11f5dd9e0
-updated: 2016-09-17T16:46:31.252203117-05:00
+updated: 2016-09-18T13:11:48.561194201-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
@@ -19,6 +19,8 @@ testImports:
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
+- name: github.com/jarcoal/httpmock
+  version: 145b10d659265440f062c31ea15326166bae56ee
 - name: github.com/pmezard/go-difflib
   version: 792786c7400a136282c1664665ae0a8db921c6c2
   subpackages:

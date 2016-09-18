@@ -1,18 +1,20 @@
 package actions
 
-import (
-	"log"
+import "github.com/corybuecker/steam-stats-fetcher/database"
+import "github.com/corybuecker/steam-stats-fetcher/steam"
 
-	"github.com/corybuecker/steam-stats-fetcher/database"
-	"github.com/corybuecker/steam-stats-fetcher/steam"
-)
+func UpdateSteam(databaseHost string) error {
+	var database database.Interface
+	var err error
+	var steamFetcher = &steam.Fetcher{}
 
-func UpdateSteam(steamFetcher *steam.Fetcher, database database.Interface) {
-	if err := steamFetcher.GetOwnedGames(); err != nil {
-		log.Fatalln(err.Error())
+	if database, err = GetDatabase(databaseHost); err != nil {
+		return err
 	}
 
-	if err := steamFetcher.UpdateOwnedGames(database); err != nil {
-		log.Fatalln(err.Error())
+	if err = steamFetcher.UpdateOwnedGames(database); err != nil {
+		return err
 	}
+
+	return nil
 }

@@ -1,82 +1,59 @@
 package steam
 
 import (
-	"encoding/json"
-	"log"
 	"testing"
-
-	"github.com/corybuecker/steam-stats-fetcher/database"
-	"github.com/stretchr/testify/assert"
+	"time"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+
+	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
-var steamFetcher Fetcher
-
-var sampleResponse = "{\"response\": {\"games\": [{\"appid\": 10, \"name\": \"game\", \"playtime_forever\": 32}]}}"
-
-type fakejsonfetcher struct {
-	response string
-}
-
-func (jsonfetcher *fakejsonfetcher) Fetch(url string, destination interface{}) error {
-	if err := json.Unmarshal([]byte(jsonfetcher.response), destination); err != nil {
-		return err
-	}
-	return nil
-}
-
-var session *mgo.Session
+var fetcher = Fetcher{}
+var mongoDB database.Interface
 var err error
-var mongoDB *database.MongoDB
 
-func init() {
-	session, err = mgo.Dial("localhost:27017")
-	if err != nil {
-		log.Fatal(err)
-	}
-	session.SetMode(mgo.Monotonic, true)
-
-	mongoDB = &database.MongoDB{Collection: session.DB("steam_stats_fetcher_test").C("steam_test")}
-	mongoDB.Collection.DropCollection()
-	steamFetcher = Fetcher{
-		Configuration: struct {
-			SteamAPIKey string `bson:"steam_api_key"`
-			SteamID     string `bson:"steam_id"`
-		}{
-			SteamAPIKey: "API KEY",
-			SteamID:     "ID",
-		},
-	}
-	steamFetcher.Jsonfetcher = &fakejsonfetcher{
-		response: sampleResponse,
-	}
+func setupDatabase() {
+	session, _ := mgo.DialWithTimeout("localhost", time.Millisecond*500)
+	session.DB("steam_stats_fetcher").C("configuration").Insert(bson.M{"id": "steam", "steam_api_key": "API KEY", "steam_id": "ID"})
+	mongoDB = &database.MongoDB{Collection: session.DB("steam_stats_fetcher").C("steam_test")}
+	mongoDB.SetSession(session)
 }
 
-func TestURLIncludesAPIKey(t *testing.T) {
-	assert.Contains(t, steamFetcher.generateURL(), "API KEY", "should include the steam api key")
+func TestRunner(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
+	setupDatabase()
+
+	fetcher.configure(mongoDB)
+
+	t.Run("url includes api key", testURLIncludesAPIKey)
+	t.Run("url includes steam id", urlIncludesSteamID)
+	t.Run("data marshalling", dataMarshalling)
+	t.Run("data updating", dataUpdating)
 }
-func TestURLIncludesSteamID(t *testing.T) {
-	assert.Contains(t, steamFetcher.generateURL(), "ID", "should include the steam ID")
+
+func testURLIncludesAPIKey(t *testing.T) {
+	assert.Contains(t, fetcher.generateURL(), "API KEY")
+}
+func urlIncludesSteamID(t *testing.T) {
+	assert.Contains(t, fetcher.generateURL(), "ID")
 }
 
-func TestDataMarshalling(t *testing.T) {
-	steamFetcher.GetOwnedGames()
-	assert.Equal(t, 10, steamFetcher.OwnedGames.Response.Games[0].ID, "should be equal")
+func dataMarshalling(t *testing.T) {
+	httpmock.RegisterResponder("GET", fetcher.generateURL(),
+		httpmock.NewStringResponder(200, "{\"response\": {\"games\": [{\"appid\": 10, \"name\": \"game\", \"playtime_forever\": 32}]}}"))
+
+	fetcher.getOwnedGames()
+	assert.Equal(t, 10, fetcher.OwnedGames.Response.Games[0].ID, "should be equal")
 }
 
-func TestDataUpdating(t *testing.T) {
-	if err := steamFetcher.GetOwnedGames(); err != nil {
-		log.Fatalln(err)
-	}
-	if err := steamFetcher.UpdateOwnedGames(mongoDB); err != nil {
-		log.Fatalln(err)
-	}
-
-	if result, err := mongoDB.GetInt("steam_id", 10); err != nil {
-		log.Fatal(err)
-	} else {
-		assert.Equal(t, "game", result["name"], "should have been equal")
-	}
+func dataUpdating(t *testing.T) {
+	fetcher.UpdateOwnedGames(mongoDB)
+	result, _ := mongoDB.GetInt("steam_id", 10)
+	assert.Equal(t, "game", result["name"], "should have been equal")
 }
