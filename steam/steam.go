@@ -21,14 +21,17 @@ type ownedGames struct {
 		Games []ownedGame `json:"games"`
 	} `json:"response"`
 }
+
 type configuration struct {
 	SteamAPIKey string `bson:"steam_api_key"`
 	SteamID     string `bson:"steam_id"`
 }
+
 type Fetcher struct {
-	configuration configuration
-	OwnedGames    ownedGames
-	jsonFetcher   jsonfetcher.Fetcher
+	ConfigurationSettings *mgoconfig.Configuration
+	OwnedGames            ownedGames
+	jsonFetcher           jsonfetcher.Fetcher
+	configuration         configuration
 }
 
 func (fetcher *Fetcher) generateURL() string {
@@ -36,9 +39,18 @@ func (fetcher *Fetcher) generateURL() string {
 }
 
 func (fetcher *Fetcher) configure(database database.Interface) error {
-	if err := mgoconfig.Get(database.GetSession(), "steam_stats_fetcher", "steam", &fetcher.configuration); err != nil {
+	if fetcher.ConfigurationSettings == nil {
+		fetcher.ConfigurationSettings = &mgoconfig.Configuration{
+			Database: "steam_stats_fetcher",
+			Key:      "steam",
+			Session:  database.GetSession(),
+		}
+	}
+
+	if err := fetcher.ConfigurationSettings.Get(&fetcher.configuration); err != nil {
 		return err
 	}
+
 	fetcher.jsonFetcher = &jsonfetcher.Jsonfetcher{}
 
 	return nil

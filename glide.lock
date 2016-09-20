@@ -1,10 +1,10 @@
 hash: adaca28b2a4f324503b9590729dd9ed6f15a49c9dbba1652278e23e11f5dd9e0
-updated: 2016-09-18T13:11:48.561194201-05:00
+updated: 2016-09-20T08:17:03.610169792-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
 - name: github.com/corybuecker/mgoconfig
-  version: 1eab6dc5fd9023a6c62c3c122218320852f62354
+  version: 7f7ecd41ee09e1de617a35fec22dadd15b71bbeb
 - name: github.com/urfave/cli
   version: d53eb991652b1d438abdd34ce4bfa3ef1539108e
 - name: gopkg.in/mgo.v2

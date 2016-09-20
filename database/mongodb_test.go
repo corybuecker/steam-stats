@@ -20,11 +20,12 @@ func init() {
 	}
 	session.SetMode(mgo.Monotonic, true)
 
-	mongoDB = &MongoDB{session: session, Collection: session.DB("steam_stats_fetcher_test").C("mongodb_test")}
+	mongoDB = &MongoDB{Collection: session.DB("steam_stats_fetcher_test").C("mongodb_test")}
 }
 
 func TestRunner(t *testing.T) {
 	mongoDB.Collection.DropCollection()
+	mongoDB.SetSession(session)
 	t.Run("upsert int field with new data", testUpsertIntFieldWithNewData)
 	t.Run("upsert int field with existing data", testUpsertIntFieldWithExistingData)
 	t.Run("upsert int field with error", testUpsertIntFieldWithError)
