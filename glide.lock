@@ -1,5 +1,5 @@
 hash: adaca28b2a4f324503b9590729dd9ed6f15a49c9dbba1652278e23e11f5dd9e0
-updated: 2016-09-20T08:17:03.610169792-05:00
+updated: 2016-09-20T20:34:33.504593689-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
@@ -16,13 +16,13 @@ imports:
   - internal/scram
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
   - spew
 - name: github.com/jarcoal/httpmock
   version: 145b10d659265440f062c31ea15326166bae56ee
 - name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
