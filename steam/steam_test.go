@@ -67,5 +67,5 @@ func configurationNotFound(t *testing.T) {
 	session := fetcher.ConfigurationSettings.Session
 	fetcher.ConfigurationSettings = &mgoconfig.Configuration{Database: "steam_test", Key: "missing", Session: session}
 	err := fetcher.UpdateOwnedGames(mongoDB)
-	assert.EqualError(t, err, "the steam configuration could not be found")
+	assert.EqualError(t, err, "the steam configuration could not be fetched")
 }
