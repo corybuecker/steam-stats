@@ -39,6 +39,7 @@ func TestRunner(t *testing.T) {
 	t.Run("url includes steam id", urlIncludesSteamID)
 	t.Run("data marshalling", dataMarshalling)
 	t.Run("data updating", dataUpdating)
+	t.Run("configuration not found", configurationNotFound)
 }
 
 func testURLIncludesAPIKey(t *testing.T) {
@@ -60,4 +61,11 @@ func dataUpdating(t *testing.T) {
 	fetcher.UpdateOwnedGames(mongoDB)
 	result, _ := mongoDB.GetInt("steam_id", 10)
 	assert.Equal(t, "game", result["name"])
+}
+
+func configurationNotFound(t *testing.T) {
+	session := fetcher.ConfigurationSettings.Session
+	fetcher.ConfigurationSettings = &mgoconfig.Configuration{Database: "steam_test", Key: "missing", Session: session}
+	err := fetcher.UpdateOwnedGames(mongoDB)
+	assert.EqualError(t, err, "the steam configuration could not be found")
 }

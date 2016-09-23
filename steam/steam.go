@@ -1,6 +1,7 @@
 package steam
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -48,6 +49,9 @@ func (fetcher *Fetcher) configure(database database.Interface) error {
 	}
 
 	if err := fetcher.ConfigurationSettings.Get(&fetcher.configuration); err != nil {
+		if err.Error() == "not found" {
+			return errors.New("the steam configuration could not be found")
+		}
 		return err
 	}
 
