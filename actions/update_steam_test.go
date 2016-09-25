@@ -3,11 +3,11 @@ package actions
 import (
 	"testing"
 
-	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steamfetcher/database"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRunner(t *testing.T) {
+func UpdateSteamTestRunner(t *testing.T) {
 	t.Run("opening the session", testGetSession)
 	t.Run("building the database", testBuildDatabase)
 	t.Run("building the database with error", testBuildDatabaseError)

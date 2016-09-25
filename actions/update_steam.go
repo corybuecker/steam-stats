@@ -1,7 +1,9 @@
 package actions
 
-import "github.com/corybuecker/steam-stats-fetcher/database"
-import "github.com/corybuecker/steam-stats-fetcher/steam"
+import (
+	"github.com/corybuecker/steamfetcher/database"
+	"github.com/corybuecker/steamfetcher/steam"
+)
 
 func UpdateSteam(databaseHost string) error {
 	var database database.Interface

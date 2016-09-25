@@ -3,7 +3,7 @@ package actions
 import (
 	"time"
 
-	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steamfetcher/database"
 
 	mgo "gopkg.in/mgo.v2"
 )
@@ -28,7 +28,7 @@ func GetDatabase(databaseHost string) (database.Interface, error) {
 		return nil, err
 	}
 
-	database := &database.MongoDB{Collection: session.DB("steam_stats_fetcher").C("games")}
+	database := &database.MongoDB{Collection: session.DB("steamfetcher").C("games")}
 	database.SetSession(session)
 
 	return database, nil

@@ -20,7 +20,7 @@ func init() {
 	}
 	session.SetMode(mgo.Monotonic, true)
 
-	mongoDB = &MongoDB{Collection: session.DB("steam_stats_fetcher_test").C("mongodb_test")}
+	mongoDB = &MongoDB{Collection: session.DB("steamfetcher_test").C("mongodb_test")}
 }
 
 func TestRunner(t *testing.T) {

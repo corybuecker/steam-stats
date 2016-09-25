@@ -1,10 +1,12 @@
-hash: adaca28b2a4f324503b9590729dd9ed6f15a49c9dbba1652278e23e11f5dd9e0
-updated: 2016-09-20T20:34:33.504593689-05:00
+hash: 7535d3a8b6413feb86035b7f0ff9e169147ce1e695868e9d195afcd46380c0c5
+updated: 2016-09-23T07:51:51.549278111-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
 - name: github.com/corybuecker/mgoconfig
   version: 7f7ecd41ee09e1de617a35fec22dadd15b71bbeb
+- name: github.com/corybuecker/wikipediasearch
+  version: e042e593ea0b3645cc43f2ac835b9fc6fc54fe12
 - name: github.com/urfave/cli
   version: d53eb991652b1d438abdd34ce4bfa3ef1539108e
 - name: gopkg.in/mgo.v2

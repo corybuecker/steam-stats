@@ -7,7 +7,7 @@ import (
 
 	"github.com/corybuecker/jsonfetcher"
 	"github.com/corybuecker/mgoconfig"
-	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steamfetcher/database"
 )
 
 type ownedGame struct {
@@ -42,7 +42,7 @@ func (fetcher *Fetcher) generateURL() string {
 func (fetcher *Fetcher) configure(database database.Interface) error {
 	if fetcher.ConfigurationSettings == nil {
 		fetcher.ConfigurationSettings = &mgoconfig.Configuration{
-			Database: "steam_stats_fetcher",
+			Database: "steamfetcher",
 			Key:      "steam",
 			Session:  database.GetSession(),
 		}

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/corybuecker/steam-stats-fetcher/actions"
+	"github.com/corybuecker/steamfetcher/actions"
 	"github.com/urfave/cli"
 )
 
@@ -12,7 +12,7 @@ func main() {
 
 	app := cli.NewApp()
 
-	app.Name = "steam-stats-fetcher"
+	app.Name = "steamfetcher"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -29,6 +29,17 @@ func main() {
 			Usage: "update all owned games from steam",
 			Action: func(c *cli.Context) error {
 				if err := actions.UpdateSteam(databaseHost); err != nil {
+					return err
+				}
+				return nil
+			},
+		},
+
+		{
+			Name:  "wikipedia",
+			Usage: "search for wikipedia pages for all owned games",
+			Action: func(c *cli.Context) error {
+				if err := actions.SearchWikipedia(databaseHost); err != nil {
 					return err
 				}
 				return nil

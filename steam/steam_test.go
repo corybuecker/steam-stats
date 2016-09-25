@@ -8,7 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/corybuecker/mgoconfig"
-	"github.com/corybuecker/steam-stats-fetcher/database"
+	"github.com/corybuecker/steamfetcher/database"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )

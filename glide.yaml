@@ -1,10 +1,12 @@
-package: github.com/corybuecker/steam-stats-fetcher
+package: github.com/corybuecker/steamfetcher
 import:
 - package: github.com/corybuecker/jsonfetcher
 - package: github.com/corybuecker/mgoconfig
+- package: github.com/corybuecker/wikipediasearch
 - package: github.com/urfave/cli
 - package: gopkg.in/mgo.v2
   subpackages:
   - bson
 testImport:
   - package: github.com/stretchr/testify/assert
+  - package: github.com/jarcoal/httpmock
