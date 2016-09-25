@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func UpdateSteamTestRunner(t *testing.T) {
+func TestUpdateSteam(t *testing.T) {
 	t.Run("opening the session", testGetSession)
 	t.Run("building the database", testBuildDatabase)
 	t.Run("building the database with error", testBuildDatabaseError)

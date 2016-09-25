@@ -27,7 +27,7 @@ func setupDatabase() {
 	mongoDB.SetSession(session)
 }
 
-func TestRunner(t *testing.T) {
+func TestSteam(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 

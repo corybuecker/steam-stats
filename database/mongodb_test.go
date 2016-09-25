@@ -23,7 +23,7 @@ func init() {
 	mongoDB = &MongoDB{Collection: session.DB("steamfetcher_test").C("mongodb_test")}
 }
 
-func TestRunner(t *testing.T) {
+func TestMongoDB(t *testing.T) {
 	mongoDB.Collection.DropCollection()
 	mongoDB.SetSession(session)
 	t.Run("upsert int field with new data", testUpsertIntFieldWithNewData)

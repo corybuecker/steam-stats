@@ -12,7 +12,7 @@ func getSession(databaseHost string) (*mgo.Session, error) {
 	var session *mgo.Session
 	var err error
 
-	if session, err = mgo.DialWithTimeout(databaseHost, time.Millisecond*500); err != nil {
+	if session, err = mgo.DialWithTimeout(databaseHost, time.Second); err != nil {
 		return nil, err
 	}
 
