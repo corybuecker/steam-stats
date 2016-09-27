@@ -1,5 +1,5 @@
-hash: 7535d3a8b6413feb86035b7f0ff9e169147ce1e695868e9d195afcd46380c0c5
-updated: 2016-09-23T07:51:51.549278111-05:00
+hash: baf63cd108f991492fcc8993fc83ae68693a66a10253fcb97191b34cc23c2592
+updated: 2016-09-27T17:58:26.621032416-05:00
 imports:
 - name: github.com/corybuecker/jsonfetcher
   version: a5715629adf9a579a2a9941a53a733104cd4e454
@@ -7,6 +7,10 @@ imports:
   version: 7f7ecd41ee09e1de617a35fec22dadd15b71bbeb
 - name: github.com/corybuecker/wikipediasearch
   version: e042e593ea0b3645cc43f2ac835b9fc6fc54fe12
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  subpackages:
+  - spew
 - name: github.com/urfave/cli
   version: d53eb991652b1d438abdd34ce4bfa3ef1539108e
 - name: gopkg.in/mgo.v2
@@ -17,10 +21,6 @@ imports:
   - internal/sasl
   - internal/scram
 testImports:
-- name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
-  subpackages:
-  - spew
 - name: github.com/jarcoal/httpmock
   version: 145b10d659265440f062c31ea15326166bae56ee
 - name: github.com/pmezard/go-difflib
@@ -28,6 +28,6 @@ testImports:
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
-  version: d77da356e56a7428ad25149ca77381849a6a5232
+  version: 976c720a22c8eb4eb6a0b4348ad85ad12491a506
   subpackages:
   - assert
