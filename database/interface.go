@@ -7,4 +7,13 @@ type Interface interface {
 	GetSession() *mgo.Session
 	GetInt(string, int) (map[string]interface{}, error)
 	UpsertIntField(string, int, interface{}) error
+	GetAllGamesWithoutURL() ([]Game, error)
+}
+
+type Game struct {
+	ID              int    `json:"appid" bson:"steam_id"`
+	Name            string `json:"name" bson:"name"`
+	PlaytimeForever int    `json:"playtime_forever" bson:"playtimeForever"`
+	PlaytimeRecent  int    `json:"playtime_2weeks" bson:"playtimeRecent"`
+	WikipediaURL    string `bson:"wikipediaURL"`
 }

@@ -32,3 +32,10 @@ func (mongoDB *MongoDB) GetInt(field string, searchValue int) (result map[string
 
 	return result, nil
 }
+func (mongoDB *MongoDB) GetAllGamesWithoutURL() (results []Game, err error) {
+	if err = mongoDB.Collection.Find(bson.M{"wikipediaURL": bson.M{"$exists": false}}).All(&results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}

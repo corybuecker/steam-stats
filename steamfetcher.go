@@ -34,6 +34,17 @@ func main() {
 				return nil
 			},
 		},
+
+		{
+			Name:  "wikipedia",
+			Usage: "fetch games from wikipedia",
+			Action: func(c *cli.Context) error {
+				if err := actions.SearchWikipedia(databaseHost); err != nil {
+					return err
+				}
+				return nil
+			},
+		},
 	}
 
 	app.Run(os.Args)

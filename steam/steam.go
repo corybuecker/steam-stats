@@ -10,16 +10,9 @@ import (
 	"github.com/corybuecker/steamfetcher/database"
 )
 
-type ownedGame struct {
-	ID              int    `json:"appid" bson:"steam_id"`
-	Name            string `json:"name" bson:"name"`
-	PlaytimeForever int    `json:"playtime_forever" bson:"playtimeForever"`
-	PlaytimeRecent  int    `json:"playtime_2weeks" bson:"playtimeRecent"`
-}
-
 type ownedGames struct {
 	Response struct {
-		Games []ownedGame `json:"games"`
+		Games []database.Game `json:"games"`
 	} `json:"response"`
 }
 

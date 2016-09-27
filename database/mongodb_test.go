@@ -26,11 +26,20 @@ func init() {
 func TestMongoDB(t *testing.T) {
 	mongoDB.Collection.DropCollection()
 	mongoDB.SetSession(session)
+
+	t.Run("get games without URL if all records have URL", testGetAllGamesWithoutURLMissing)
 	t.Run("upsert int field with new data", testUpsertIntFieldWithNewData)
 	t.Run("upsert int field with existing data", testUpsertIntFieldWithExistingData)
 	t.Run("upsert int field with error", testUpsertIntFieldWithError)
 	t.Run("get int with error", testGetIntWithError)
 	t.Run("get session", testGetSession)
+	t.Run("get games without URL", testGetAllGamesWithoutURL)
+}
+
+func testGetAllGamesWithoutURLMissing(t *testing.T) {
+	mongoDB.UpsertIntField("steam_id", 1, map[string]interface{}{"wikipediaURL": "test"})
+	results, _ := mongoDB.GetAllGamesWithoutURL()
+	assert.Empty(t, results)
 }
 
 func testUpsertIntFieldWithNewData(t *testing.T) {
@@ -58,4 +67,10 @@ func testGetIntWithError(t *testing.T) {
 func testGetSession(t *testing.T) {
 	session := mongoDB.GetSession()
 	assert.Equal(t, mongoDB.session, session)
+}
+
+func testGetAllGamesWithoutURL(t *testing.T) {
+	mongoDB.UpsertIntField("steam_id", 2, map[string]interface{}{"name": "test"})
+	results, _ := mongoDB.GetAllGamesWithoutURL()
+	assert.Equal(t, "test", results[0].Name)
 }
