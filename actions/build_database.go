@@ -15,7 +15,8 @@ func getSession(databaseHost string) (*mgo.Session, error) {
 	if session, err = mgo.DialWithTimeout(databaseHost, time.Second); err != nil {
 		return nil, err
 	}
-
+	session.SetSocketTimeout(time.Second)
+	session.SetSyncTimeout(time.Second)
 	session.SetMode(mgo.Monotonic, true)
 	return session, nil
 }

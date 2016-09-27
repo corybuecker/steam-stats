@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpdateSteam(t *testing.T) {
+func TestBuildDatabase(t *testing.T) {
 	t.Run("opening the session", testGetSession)
 	t.Run("building the database", testBuildDatabase)
 	t.Run("building the database with error", testBuildDatabaseError)
@@ -25,6 +25,6 @@ func testBuildDatabase(t *testing.T) {
 }
 
 func testBuildDatabaseError(t *testing.T) {
-	_, err := GetDatabase("s")
+	_, err := GetDatabase("localhost:8888")
 	assert.EqualError(t, err, "no reachable servers")
 }
