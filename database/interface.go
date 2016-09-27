@@ -15,5 +15,4 @@ type Game struct {
 	Name            string `json:"name" bson:"name"`
 	PlaytimeForever int    `json:"playtime_forever" bson:"playtimeForever"`
 	PlaytimeRecent  int    `json:"playtime_2weeks" bson:"playtimeRecent"`
-	WikipediaURL    string `bson:"wikipediaURL"`
 }
